@@ -5,7 +5,7 @@ function Home(props) {
             <p>home page</p>
             <ul>
                 {props.posts.map(post => (
-                    <li><a href={`posts/${post._id}`}>{post.title}</a></li>
+                    <li key={post._id}><a href={`posts/${post._id}`}>{post.title}</a></li>
                 ))}
             </ul>
         </div>

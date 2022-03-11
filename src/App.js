@@ -1,3 +1,4 @@
+import './App.css';
 import React, { useState, useEffect } from 'react'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import Navbar from './components/Navbar'
@@ -26,14 +27,13 @@ function App() {
     })
     .finally(() => {
       setLoading(false)
-      console.log(posts)
     })
   }, [loading])
 
+  console.log(posts)
   if (error) return 'Error...'
   if (loading) return 'Loading...'
 
-  
   return (
     <div>
       <BrowserRouter>
@@ -81,6 +81,8 @@ function App() {
             <Route path={`posts/${post._id}`} element={
               <SinglePost 
                 key={post._id}
+                loading={loading}
+                setLoading={setLoading}
                 id={post._id}
                 validUser={validUser}
               />

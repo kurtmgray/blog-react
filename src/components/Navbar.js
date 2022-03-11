@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 function Navbar() {
     return (
@@ -6,9 +7,10 @@ function Navbar() {
                 <h1>Bob Loblaw's Law Blog</h1>            
             </div>
             <div className='auth_buttons'>
-                <a href='/'>Sign Up</a>
-                <a href='/'>Log In</a>
-                <a href='/'>Log Out</a>
+                <Link to='/'>Home</Link>
+                <Link to='/signup'>Sign Up</Link>
+                <Link to='/login'>Log In</Link>
+                <Link to='/logout'>Log Out</Link>
             </div>
         </div>
     )
