@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
+import { UserContext } from '../UserContext'
 
 
-
-function Create({ validUser, posts, setPosts}) {
+function Create({posts, setPosts}) {
     const [title, setTitle] = useState('')    
     const [text, setText] = useState('')    
     const [published, setPublished] = useState(false)
+    const {currentUser, setCurrentUser} = useContext(UserContext)
+    
+    console.log(currentUser)
     
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await fetch("http://localhost:8000/api/posts/create", {
+        await fetch("http://localhost:8000/api/posts/", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                author: currentUser ? currentUser.id : null,
                 title: title,
                 text: text,
                 published: published
@@ -39,7 +43,7 @@ function Create({ validUser, posts, setPosts}) {
                     name="title"  
                     value={title} 
                     onChange={e => setTitle(e.target.value)}
-                    required="true">
+                    required>
                 </input>    
                 <label htmlFor="text">Content:</label>
                 <textarea 
@@ -47,7 +51,7 @@ function Create({ validUser, posts, setPosts}) {
                     name="text" 
                     value={text}
                     onChange={e => setText(e.target.value)}
-                    required="true">
+                    required>
                 </textarea>
                 <label htmlFor="published">Publish?</label>
                 <input 

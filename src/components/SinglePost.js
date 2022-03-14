@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { UserContext } from '../UserContext'
 import Comment from './Comment'
 
 function SinglePost({ id }) {
+    const {currentUser, setCurrentUser} = useContext(UserContext)
+
+    console.log(currentUser)
+    
     const [post, setPost] = useState(null)
 
     useEffect(() => {
@@ -22,7 +27,7 @@ function SinglePost({ id }) {
             <div>
                 <h3>{post.title}</h3>
                 <p>{post.text}</p>
-                <p>{post.author.fname}</p>
+                {/* <p>{post.author.fname}</p> */}
                 {post.comments.map(commentId => (
                     <Comment 
                         key={commentId}

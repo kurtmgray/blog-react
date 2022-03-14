@@ -1,10 +1,10 @@
 
-function Home(props) {
+function Home({ posts }) {
     return (
         <div>
             <p>home page</p>
             <ul>
-                {props.posts.map(post => (
+                {posts.map(post => (
                     <li key={post._id}><a href={`posts/${post._id}`}>{post.title}</a></li>
                 ))}
             </ul>

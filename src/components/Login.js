@@ -1,28 +1,63 @@
-import axios from 'axios'
-import React, { useState } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { useNavigate } from 'react-router'
+import { UserContext } from '../UserContext'
 
-function Login({ validUser, setValidUser}) {
+function Login() {
+    const {currentUser, setCurrentUser} = useContext(UserContext)
+
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
+    let navigate = useNavigate()
+    
+    // check for token to see if already logged in, redirect to /dashboard if so
+    useEffect(()=> {
+        const bearerToken = localStorage.getItem('token')
+        const token = bearerToken.slice(7)    
+        
+        // pass this token to header
+        fetch('http://localhost:8000/api/users' , {
+            headers: { 
+                Authorization: token 
+            }
+        }).then(res => {
+            console.log('res', res.body)
+            if (res.ok) {
+                navigate('/dashboard')
+            }
+        }).catch(err => {
+            console.log('err', err)
+        })
+    }, [])
+    
+    // post login credentials to server, get user back, set user to response, save token to LS, redirect to /dashboard
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        await fetch('http://localhost:8000/api/users/login', {
-            method: "POST",
-            headers: { "Content-type": "application/json" },
-            body: {
-                username: username,
-                password: password
-            }
-        })
-        .then(res => res.json())
-        .then(data => console.log(data))
-        .catch(err => console.log(err))
-        .finally(() => {
-            setUsername('')
-            setPassword('')
-        })
+        try {
+            const res = await fetch('http://localhost:8000/api/users/login', {
+                method: "POST",
+                headers: { "Content-type": "application/json"},
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+            const data = await res.json()
+            setCurrentUser(data.user)
+            localStorage.setItem('token', data.token)
+            navigate('/dashboard')
+            console.log(currentUser)
+        }
+        catch (err) {
+            console.log(err)
+            // use the err to set state for error
+            // display something based on the error
+        }
+        
+        // clear form/state values
+        setUsername('')
+        setPassword('')
+       
     }
     return (
         <div>
@@ -33,7 +68,7 @@ function Login({ validUser, setValidUser}) {
                     name="username" 
                     value={username} 
                     onChange={e => setUsername(e.target.value)}
-                    required="true">
+                    required>
                 </input>    
                 <label htmlFor="password">Enter your password</label>
                 <input 
@@ -41,7 +76,7 @@ function Login({ validUser, setValidUser}) {
                     name="password" 
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    required="true">
+                    required>
                 </input>
                 <button type="submit">Log In</button>
             </form>
