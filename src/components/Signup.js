@@ -1,5 +1,6 @@
-import Home from './Home'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router'
+
 
 function Signup({ setCurrentUser }) {
     const [username, setUsername] = useState('')
@@ -7,12 +8,14 @@ function Signup({ setCurrentUser }) {
     const [fname, setFname] = useState('')
     const [lname, setLname] = useState('')
     
+    let navigate = useNavigate()
+
     const handleSubmit = async (e) => {
         
         e.preventDefault()
         
         try {
-            const response = await fetch("http://localhost:8000/api/users/", {
+            const response = await fetch("http://localhost:8000/api/users", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -35,7 +38,7 @@ function Signup({ setCurrentUser }) {
         setPassword(['',''])
         setFname('')
         setLname('')
-        
+        navigate('/login')
     }
  
     console.log(username, password, fname, lname)

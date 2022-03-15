@@ -8,7 +8,7 @@ import Create from './components/Create'
 import Signup from './components/Signup'
 import Dashboard from './components/Dashboard'
 import SinglePost from './components/SinglePost'
-import Protected from './components/Protected';
+import Logout from './components/Logout'
 import { UserContext } from './UserContext';
 
 function App() {
@@ -21,18 +21,21 @@ function App() {
 
   useEffect(() => {
     const bearerToken = localStorage.getItem('token')
-    const token = bearerToken.slice(7)    
-
-    const getUser = async () => {
-      const res = await fetch('http://localhost:8000/api/users', {
+        
+    if (bearerToken) {
+      const token = localStorage.getItem('token')    
+  
+      const getUser = async () => {
+        const res = await fetch('http://localhost:8000/api/users', {
         headers: { Authorization: token },
-      })
-      const data = await res.json()
-      setCurrentUser(data.user)
-    }
-
-    if (token) {
+        })
+        const data = await res.json()
+        setCurrentUser(data.user)
+      }
       getUser()
+    } 
+    else {
+      setCurrentUser(null)
     }
   }, [])
 
@@ -66,38 +69,31 @@ function App() {
             <Route path='/' element={
               <Home 
                 posts={posts}
-                
               />  
             }>  
             </Route>
             <Route path='/login' element={
-              <Login 
-              
-              />  
+              <Login />  
             }>
             </Route>
-            <Route path='/protected' element={
-              <Protected />
+            <Route path='/logout' element={
+              <Logout />
             }>
             </Route>
             <Route path='/create' element={
               <Create 
-                
                 posts={posts}
                 setPosts={setPosts}
               />
             }>
             </Route>
             <Route path='/signup' element={
-              <Signup
-              
-              />  
+              <Signup />  
             }>
             </Route>
             <Route path='/dashboard' element={
               <Dashboard 
-                
-                posts={posts}
+                posts={posts} 
                 setPosts={setPosts}
               />
             }>  

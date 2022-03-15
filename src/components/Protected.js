@@ -7,16 +7,14 @@ function Protected() {
     useEffect(()=> {
         const token = localStorage.getItem('token')
         // pass this token to header
-        fetch('http://localhost:8000/protected' , {
+        fetch('http://localhost:8000/api/users' , {
             headers: { 
                 Authorization: token 
             }
         }).then(res => {
-            if (!res.ok) {
-                navigate('/login')
-            } else {
+                console.log(res)
                 res.json()
-            }
+            
         }).then(data => {
             console.log(data)    
         }).catch(err => {

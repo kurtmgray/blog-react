@@ -10,24 +10,25 @@ function Login() {
 
     let navigate = useNavigate()
     
+    const getUser = async (token) => {
+        const res = await fetch('http://localhost:8000/api/users', {
+        headers: { Authorization: token },
+        })
+        const data = await res.json()
+        setCurrentUser(data.user)
+    }
+
     // check for token to see if already logged in, redirect to /dashboard if so
     useEffect(()=> {
-        const bearerToken = localStorage.getItem('token')
-        const token = bearerToken.slice(7)    
+        const token = localStorage.getItem('token')
         
-        // pass this token to header
-        fetch('http://localhost:8000/api/users' , {
-            headers: { 
-                Authorization: token 
-            }
-        }).then(res => {
-            console.log('res', res.body)
-            if (res.ok) {
-                navigate('/dashboard')
-            }
-        }).catch(err => {
-            console.log('err', err)
-        })
+        if (token) {
+            getUser(token)
+            navigate('/dashboard')
+        }
+        else {
+            setCurrentUser(null)
+        }
     }, [])
     
     // post login credentials to server, get user back, set user to response, save token to LS, redirect to /dashboard

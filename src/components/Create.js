@@ -6,7 +6,7 @@ function Create({posts, setPosts}) {
     const [title, setTitle] = useState('')    
     const [text, setText] = useState('')    
     const [published, setPublished] = useState(false)
-    const {currentUser, setCurrentUser} = useContext(UserContext)
+    const { currentUser } = useContext(UserContext)
     
     console.log(currentUser)
     

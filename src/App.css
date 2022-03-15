@@ -3,7 +3,8 @@
     justify-content: center;
     margin-top: 5rem;
   }
-  input {
+  input,
+  textarea {
     display: block;
     width: 20rem;
     height: 2rem;
