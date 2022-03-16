@@ -40,7 +40,7 @@ function Dashboard() {
             setCurrentUser(null)
             navigate('/login')
         }
-    }, [])
+    }, [currentUser])
     
     console.log(published, unpublished)
 

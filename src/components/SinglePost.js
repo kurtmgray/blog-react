@@ -27,7 +27,7 @@ function SinglePost({ id }) {
             <div>
                 <h3>{post.title}</h3>
                 <p>{post.text}</p>
-                {/* <p>{post.author.fname}</p> */}
+                <p>{post.author.fname}</p>
                 {post.comments.map(commentId => (
                     <Comment 
                         key={commentId}

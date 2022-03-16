@@ -12,23 +12,25 @@ function Create({posts, setPosts}) {
     
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await fetch("http://localhost:8000/api/posts/", {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                author: currentUser ? currentUser.id : null,
-                title: title,
-                text: text,
-                published: published
+        try {
+            const res = await fetch("http://localhost:8000/api/posts/", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    author: currentUser ? currentUser.id : null,
+                    title: title,
+                    text: text,
+                    published: published
+                })
             })
-        })
-        .then(res => res.json())
-        .then(data => console.log('Success', data))
-        .catch(err => console.log(err))
-        .finally(() => {
-            setTitle('')
-            setText('')
-        })
+            const data = res.json()
+            console.log('Success', data)
+
+        } catch(err) {
+            console.log(err)
+        }
+        setTitle('')
+        setText('')
     }
 
     console.log(title, text)

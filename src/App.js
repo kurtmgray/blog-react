@@ -2,6 +2,7 @@ import './App.css';
 import React, { useState, useEffect, useMemo } from 'react'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import Navbar from './components/Navbar'
+import Admin from './components/Admin';
 import Home from './components/Home'
 import Login from './components/Login'
 import Create from './components/Create'
@@ -26,30 +27,37 @@ function App() {
       const token = localStorage.getItem('token')    
   
       const getUser = async () => {
-        const res = await fetch('http://localhost:8000/api/users', {
-        headers: { Authorization: token },
-        })
-        const data = await res.json()
-        setCurrentUser(data.user)
-      }
+        try {
+          const res = await fetch('http://localhost:8000/api/users', {
+            headers: { 
+              Authorization: token 
+            },
+          })
+          const data = await res.json()
+          setCurrentUser(data.user)
+        } catch (err) {
+          console.error(err)
+        }
+      } 
       getUser()
-    } 
-    else {
+    } else {
       setCurrentUser(null)
     }
   }, [])
 
   useEffect( () => {
-    fetch('http://localhost:8000/api/posts')
-    .then(res => res.json())
-    .then(data => setPosts(data.posts))
-    .catch(err => {
-      console.error('error fetching data', err)
-      setError(err)
-    })
-    .finally(() => {
-      setLoading(false)
-    })
+    const getAllPosts = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/posts')
+        const data = await res.json()
+        setPosts(data.posts)
+        setLoading(false)
+      } catch (err) {
+        console.error('error fetching data', err)
+        setError(err)
+      }
+    }
+    getAllPosts()
   }, [])
 
   console.log(posts)
@@ -61,16 +69,20 @@ function App() {
     <div>
       <BrowserRouter>
         <UserContext.Provider value={value}>  
-          <Navbar 
-             
-          
-          />
+          <Navbar />
           <Routes>
             <Route path='/' element={
               <Home 
                 posts={posts}
               />  
             }>  
+            </Route>
+            <Route path='/admin' element={
+              <Admin 
+                posts={posts}
+                setPosts={setPosts}
+              />  
+            }>
             </Route>
             <Route path='/login' element={
               <Login />  

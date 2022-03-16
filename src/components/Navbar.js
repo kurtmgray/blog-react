@@ -4,7 +4,7 @@ import { UserContext } from "../UserContext";
 
 function Navbar() {
     const { currentUser } = useContext(UserContext)
-    
+    console.log(currentUser)
     return (
         <div>
             <div className='title'>
@@ -12,9 +12,10 @@ function Navbar() {
             </div>
             <div className='auth_buttons'>
                 <Link to='/'>Home  </Link>
+                <Link to='/create'>Create  </Link>
                 {currentUser ? null : <Link to='/signup'>Sign Up  </Link>}
                 {currentUser ? null : <Link to='/login'>Log In  </Link>}
-                {currentUser ? <Link to='/create'>Create  </Link> : null}
+                {currentUser && currentUser.admin ? <Link to='/admin'>Admin  </Link> : null}
                 {currentUser ? <Link to='/dashboard'>Dashboard  </Link> : null}
                 {!currentUser ? null : <Link to='/logout'>Log Out</Link>}
             </div>
