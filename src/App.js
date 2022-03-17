@@ -9,6 +9,7 @@ import Create from './components/Create'
 import Signup from './components/Signup'
 import Dashboard from './components/Dashboard'
 import SinglePost from './components/SinglePost'
+import EditPost from './components/EditPost';
 import Logout from './components/Logout'
 import { UserContext } from './UserContext';
 
@@ -112,16 +113,25 @@ function App() {
             </Route>
             {posts && posts.map(post => (
               <Route 
-                path={`posts/${post._id}`} 
+                path={`/posts/${post._id}`} 
                 key={post._id} 
                 element={ 
                   <SinglePost 
-                    loading={loading}
-                    setLoading={setLoading}
                     id={post._id}
-                    
                   />
               }>
+              </Route>  
+            ))}
+            {/* place this edit route here? use router within admin component? */}
+            {posts && posts.map(post => (
+              <Route 
+                path={`/posts/${post._id}/edit`} 
+                key={post._id} 
+                element={ 
+                  <EditPost 
+                    id={post._id}
+                  />
+                }>
               </Route>  
             ))}
           </Routes>

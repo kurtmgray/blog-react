@@ -13,7 +13,7 @@ function SinglePost({ id }) {
 
         fetch(`http://localhost:8000/api/posts/${id}`)
         .then(res => res.json())
-        .then(data => setPost(data.posts))
+        .then(data => setPost(data.post))
         .finally(()=>{
             console.log(id)
         })
@@ -27,7 +27,7 @@ function SinglePost({ id }) {
             <div>
                 <h3>{post.title}</h3>
                 <p>{post.text}</p>
-                <p>{post.author.fname}</p>
+                {post.author ? <p>{post.author.fname}</p> : null }
                 {post.comments.map(commentId => (
                     <Comment 
                         key={commentId}

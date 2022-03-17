@@ -27,7 +27,7 @@ function Create({posts, setPosts}) {
             console.log('Success', data)
 
         } catch(err) {
-            console.log(err)
+            console.error(err)
         }
         setTitle('')
         setText('')

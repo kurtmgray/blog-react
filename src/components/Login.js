@@ -10,20 +10,24 @@ function Login() {
 
     let navigate = useNavigate()
     
+    // define inside the useEffect?
     const getUser = async (token) => {
         const res = await fetch('http://localhost:8000/api/users', {
-        headers: { Authorization: token },
+            headers: { 
+                Authorization: token 
+            },
         })
         const data = await res.json()
-        setCurrentUser(data.user)
+        return data.user
     }
-
+    
     // check for token to see if already logged in, redirect to /dashboard if so
     useEffect(()=> {
         const token = localStorage.getItem('token')
         
         if (token) {
-            getUser(token)
+            const user = getUser(token)
+            setCurrentUser(user)
             navigate('/dashboard')
         }
         else {
