@@ -14,7 +14,7 @@ function Login() {
     const getUser = async (token) => {
         const res = await fetch('http://localhost:8000/api/users', {
             headers: { 
-                Authorization: token 
+                Authorization: 'Bearer ' + token 
             },
         })
         const data = await res.json()
@@ -24,15 +24,18 @@ function Login() {
     // check for token to see if already logged in, redirect to /dashboard if so
     useEffect(()=> {
         const token = localStorage.getItem('token')
-        
-        if (token) {
-            const user = getUser(token)
-            setCurrentUser(user)
-            navigate('/dashboard')
+        const initUser = async () => {
+            if (token) {
+                const user = await getUser(token)
+                setCurrentUser(user)
+                navigate('/dashboard')
+            }
+            else {
+                console.log('else')
+                setCurrentUser(null)
+            }
         }
-        else {
-            setCurrentUser(null)
-        }
+        initUser()
     }, [])
     
     // post login credentials to server, get user back, set user to response, save token to LS, redirect to /dashboard
@@ -41,7 +44,9 @@ function Login() {
         try {
             const res = await fetch('http://localhost:8000/api/users/login', {
                 method: "POST",
-                headers: { "Content-type": "application/json"},
+                headers: { 
+                    "Content-type": "application/json",
+                },
                 body: JSON.stringify({
                     username: username,
                     password: password

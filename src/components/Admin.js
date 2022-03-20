@@ -2,57 +2,65 @@ import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router'
 import { UserContext } from '../UserContext';
 
-//new
 function Admin({ posts, setPosts }) {
     const { currentUser } = useContext(UserContext)
     let navigate = useNavigate()
-
-    // dependency/toggle to trigger useEffect
-    // const [updatePosts, setUpdatePosts] = useState(false)
+    console.log( currentUser)
     
-
-    // same code as in app if i don't send the posts back in the DELETE call
-    // do I put in its own module?
-    // useEffect(() => {
-    //     const getAllPosts = async () => {
-    //         try {
-    //           const res = await fetch('http://localhost:8000/api/posts')
-    //           const data = await res.json()
-    //           setPosts(data.posts)
-    //         } catch (err) {
-    //           console.error('error fetching data', err)
-    //         }
-    //       }
-    //       getAllPosts()
-    // }, [updatePosts])
-
-
+    useEffect(() => {
+        getAllPosts()
+        if (!currentUser || !currentUser.admin) {
+            console.log('use')
+            navigate('/')   
+        } 
+    },[])
+    
+    const getAllPosts = async () => {
+        try {
+            const res = await fetch('http://localhost:8000/api/posts')
+            const data = await res.json()
+            setPosts(data.posts)
+        } catch (err) {
+            console.error('error fetching data', err)
+        }
+    }
+   
     const handleDelete = async (e) => {
-        
+        const token = localStorage.getItem('token')
+
         const res = await fetch(`http://localhost:8000/api/posts/${e.target.id}`, {
             method: "DELETE",
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
         })
-        const data = await res.json() // updated posts in here
-        setPosts(data.posts) // would delete if using the above useEffect
-        //setUpdatePosts(!updatePosts)
+        const data = await res.json()
+        console.log(data)
+        getAllPosts()
+        
     }
     
     const handlePubToggle = async (e) => {
-        
+        const token = localStorage.getItem('token')
         const selectedPost = posts.find(post => post._id === e.target.id)
         
         const res = await fetch(`http://localhost:8000/api/posts/${e.target.id}`, {
             method: "PATCH",
             headers: { 
-                "Content-type": "application/json"
+                "Content-type": "application/json",
+                Authorization: 'Bearer ' + token
             },
             body: JSON.stringify({
                 published: !selectedPost.published
             }),
         })
         const data = await res.json()
-        setPosts(data.posts)
-        //setUpdatePosts(!updatePosts)
+        
+        const postsCopy = [...posts]
+        const newPostIndex = posts.findIndex(post => post._id === data.updatedPost._id)
+        postsCopy.splice(newPostIndex, 1, data.updatedPost)
+        setPosts(postsCopy)
+
     }
 
     const handleEdit = (e) => {
@@ -60,12 +68,6 @@ function Admin({ posts, setPosts }) {
         navigate(`/posts/${post._id}/edit`)
     }
     
-    // is this sufficient to check for a valid user, or do i need to make the API call every time?
-    useEffect(() => {
-        if (!currentUser || !currentUser.admin) {
-            navigate('/')
-        } 
-    },[])
 
     return ( 
         <div>

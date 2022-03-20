@@ -4,7 +4,13 @@ function Comment({postId, commentId}) {
     const [comment, setComment] = useState(null)
     
     useEffect(() => {
-        fetch(`http://localhost:8000/api/posts/${postId}/comments/${commentId}`)
+        const token = localStorage.getItem('token')
+                
+        fetch(`http://localhost:8000/api/posts/${postId}/comments/${commentId}`, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
         .then(res => res.json())
         .then(data => setComment(data.comment))
       }, [postId, commentId])

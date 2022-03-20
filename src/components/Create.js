@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { UserContext } from '../UserContext'
+import { useNavigate } from 'react-router'
 
 
 function Create({posts, setPosts}) {
@@ -7,15 +8,20 @@ function Create({posts, setPosts}) {
     const [text, setText] = useState('')    
     const [published, setPublished] = useState(false)
     const { currentUser } = useContext(UserContext)
-    
+    let navigate = useNavigate()
+
     console.log(currentUser)
     
     const handleSubmit = async (e) => {
         e.preventDefault()
+        const token = localStorage.getItem('token')
         try {
             const res = await fetch("http://localhost:8000/api/posts/", {
                 method: "POST",
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    Authorization: 'Bearer ' + token  
+                },
                 body: JSON.stringify({
                     author: currentUser ? currentUser.id : null,
                     title: title,
@@ -23,8 +29,9 @@ function Create({posts, setPosts}) {
                     published: published
                 })
             })
-            const data = res.json()
+            const data = await res.json()
             console.log('Success', data)
+            navigate('/dashboard')
 
         } catch(err) {
             console.error(err)
@@ -55,15 +62,16 @@ function Create({posts, setPosts}) {
                     onChange={e => setText(e.target.value)}
                     required>
                 </textarea>
-                <label htmlFor="published">Publish?</label>
-                <input 
-                    type="checkbox"
-                    name="published"
-                    rows="5"
-                    columns="32"
-                    onClick={e => setPublished(!published)}>    
-                </input>
-                     
+                <div className="published">
+                    <label htmlFor="published">Publish?</label>
+                    <input 
+                        type="checkbox"
+                        name="published"
+                        rows="5"
+                        columns="32"
+                        onClick={e => setPublished(!published)}>    
+                    </input>
+                </div>     
                 <button type="submit">Submit Post</button>    
             </form>
         </div>

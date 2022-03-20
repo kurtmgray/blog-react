@@ -10,11 +10,35 @@ function Dashboard() {
     
     let navigate = useNavigate()
     
-    const getPosts = async () => {
-        const res = await fetch(`http://localhost:8000/api/users/${currentUser.id}/posts`)
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (currentUser) {
+            getPosts(token)
+        }
+        else if (token) {
+            getUser(token)
+            getPosts(token)
+        } 
+        else {
+            setCurrentUser(null)
+            navigate('/login')
+        }
+    }, [currentUser])
+    
+    const getPosts = async (token) => {
+        const res = await fetch(`http://localhost:8000/api/users/${currentUser.id}/posts`, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
         const data = await res.json()
-        setPublished(data.posts.published)
-        setUnpublished(data.posts.unpublished)
+        const timeSortedPublishedPosts = 
+            data.posts.published.sort((a, b) => (b.timestamp > a.timestamp) ? 1 : -1)
+        const timeSortedUnpublishedPosts = 
+            data.posts.unpublished.sort((a, b) => (b.timestamp > a.timestamp) ? 1 : -1)
+        
+        setPublished(timeSortedPublishedPosts)
+        setUnpublished(timeSortedUnpublishedPosts)
     }
     
     const getUser = async (token) => {
@@ -27,36 +51,19 @@ function Dashboard() {
         await setCurrentUser(data.user)
     }
     
-    useEffect(() => {
-        const token = localStorage.getItem('token')
-        if(currentUser) {
-            getPosts()
-        }
-        else if (token) {
-            getUser(token)
-            getPosts()
-        } 
-        else {
-            setCurrentUser(null)
-            navigate('/login')
-        }
-    }, [currentUser])
-    
-    console.log(published, unpublished)
-
     return (
         <div>
             {currentUser ? (
                 <div>
-                    <h2>Welcome {currentUser.username}</h2> 
-                    <ul> Published Posts 
+                    <h2>Welcome to your Dashboard, {currentUser.username}.</h2> 
+                    <ul> <h3>Published Posts</h3> 
                         {published ? (
                             published.map(post => <li key={post._id}><a href={`posts/${post._id}`}>{post.title}</a></li>)
                         ) : (
                             <p>You have no published posts</p> 
                         )} 
                     </ul>
-                    <ul> Unpublished Posts
+                    <ul> <h3>Unpublished Posts</h3>
                         {unpublished ? (
                             unpublished.map(post => <li key={post._id}><a href={`posts/${post._id}`}>{post.title}</a></li>)
                         ) : (

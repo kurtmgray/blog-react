@@ -22,16 +22,14 @@ function App() {
   const value = useMemo(() => ({currentUser, setCurrentUser}), [currentUser, setCurrentUser])
 
   useEffect(() => {
-    const bearerToken = localStorage.getItem('token')
+    const token = localStorage.getItem('token')
         
-    if (bearerToken) {
-      const token = localStorage.getItem('token')    
-  
+    if (token) {
       const getUser = async () => {
         try {
           const res = await fetch('http://localhost:8000/api/users', {
             headers: { 
-              Authorization: token 
+              Authorization: 'Bearer ' + token 
             },
           })
           const data = await res.json()
@@ -51,7 +49,8 @@ function App() {
       try {
         const res = await fetch('http://localhost:8000/api/posts')
         const data = await res.json()
-        setPosts(data.posts)
+        const timeSortedPosts = data.posts.sort((a, b) => (b.timestamp > a.timestamp) ? 1 : -1)
+        setPosts(timeSortedPosts)
         setLoading(false)
       } catch (err) {
         console.error('error fetching data', err)
@@ -67,7 +66,7 @@ function App() {
   if (loading) return 'Loading...'
 
   return (
-    <div>
+    <div className='App'>
       <BrowserRouter>
         <UserContext.Provider value={value}>  
           <Navbar />
@@ -79,10 +78,10 @@ function App() {
             }>  
             </Route>
             <Route path='/admin' element={
-              <Admin 
-                posts={posts}
-                setPosts={setPosts}
-              />  
+                <Admin 
+                  posts={posts}
+                  setPosts={setPosts}
+                />  
             }>
             </Route>
             <Route path='/login' element={
@@ -111,29 +110,14 @@ function App() {
               />
             }>  
             </Route>
-            {posts && posts.map(post => (
-              <Route 
-                path={`/posts/${post._id}`} 
-                key={post._id} 
-                element={ 
-                  <SinglePost 
-                    id={post._id}
-                  />
-              }>
-              </Route>  
-            ))}
-            {/* place this edit route here? use router within admin component? */}
-            {posts && posts.map(post => (
-              <Route 
-                path={`/posts/${post._id}/edit`} 
-                key={post._id} 
-                element={ 
-                  <EditPost 
-                    id={post._id}
-                  />
-                }>
-              </Route>  
-            ))}
+            <Route 
+              path='/posts/:id' 
+              element={<SinglePost/>}  
+            />  
+            <Route 
+              path='/posts/:id/edit' 
+              element={<EditPost/>}
+            />
           </Routes>
         </UserContext.Provider>
       </BrowserRouter>  
