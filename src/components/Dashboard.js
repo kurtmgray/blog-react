@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router'
+import { Link } from 'react-router-dom'
 import { UserContext } from '../UserContext';
 
 function Dashboard() {
@@ -56,20 +57,39 @@ function Dashboard() {
             {currentUser ? (
                 <div>
                     <h2>Welcome to your Dashboard, {currentUser.username}.</h2> 
-                    <ul> <h3>Published Posts</h3> 
-                        {published ? (
-                            published.map(post => <li key={post._id}><a href={`posts/${post._id}`}>{post.title}</a></li>)
-                        ) : (
-                            <p>You have no published posts</p> 
-                        )} 
-                    </ul>
-                    <ul> <h3>Unpublished Posts</h3>
-                        {unpublished ? (
-                            unpublished.map(post => <li key={post._id}><a href={`posts/${post._id}`}>{post.title}</a></li>)
-                        ) : (
-                            <p>You have no unpublished posts</p>
-                        )}
-                    </ul>
+                    <div className="dashboard-posts-container">
+                        <h3>Published Posts</h3>
+                        <hr/> 
+                            {published ? (
+                                published.map(post => 
+                                    <Link to={`/posts/${post._id}`} style={{textDecoration: 'none'}}>
+                                        <div className="dashboard-post post-element" key={post._id}>
+                                            <img className="db-post-img post-element" src="https://picsum.photos/100/100" alt="pic"></img>
+                                            <h4 className="db-post-title post-element">{post.title}</h4>
+                                            <p className="db-text-preview post-element">{post.text}</p>
+                                        </div>     
+                                    </Link>
+                                )
+                            ) : (
+                                <p>You have no published posts</p> 
+                            )} 
+                        <h3>Unpublished Posts</h3>
+                        <hr/> 
+                            {unpublished ? (
+                                unpublished.map(post =>
+                                    <Link to={`/posts/${post._id}`} style={{textDecoration: 'none'}}> 
+                                        <div className="dashboard-post post-element" key={post._id}>
+                                            <img className="db-post-img post-element" src="https://picsum.photos/100/100" alt="pic"></img>
+                                            <h4 className="db-post-title post-element">{post.title}</h4>
+                                            <p className="db-text-preview post-element">{post.text}</p>
+                                        </div>
+                                    </Link>
+
+                                )
+                            ) : (
+                                <p>You have no unpublished posts</p>
+                            )}
+                    </div>
                 </div>
             ) : (
                 <h2>Please log in to use your Dashboard</h2>

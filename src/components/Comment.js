@@ -5,7 +5,7 @@ function Comment({postId, commentId}) {
     
     useEffect(() => {
         const token = localStorage.getItem('token')
-                
+
         fetch(`http://localhost:8000/api/posts/${postId}/comments/${commentId}`, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -18,9 +18,12 @@ function Comment({postId, commentId}) {
     if (!comment) return (<p>Loading...</p>) 
     else {
       return (
-            <div>
-                <h4>{comment.text}</h4>
-                {/* <p>{comment.author.lname}</p> */}
+            <div className="comment">
+                <p className="comment-text">{comment.text}</p>
+                <div className="comment-details">
+                    <p className="comment-author">{comment.author.username}</p>
+                    <p className="comment-date">{comment.timestamp}</p>
+                </div>
             </div>
         )
     }

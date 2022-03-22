@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { UserContext } from '../UserContext'
 import { useNavigate } from 'react-router'
 
@@ -7,6 +7,7 @@ function Create({posts, setPosts}) {
     const [title, setTitle] = useState('')    
     const [text, setText] = useState('')    
     const [published, setPublished] = useState(false)
+    const [disable, setDisable] = useState(true)
     const { currentUser } = useContext(UserContext)
     let navigate = useNavigate()
 
@@ -40,40 +41,46 @@ function Create({posts, setPosts}) {
         setText('')
     }
 
+    useEffect(() => {
+        title && text ? setDisable(false) : setDisable(true)
+    }, [title, text])
+
     console.log(title, text)
 
     return (
-        <div>
-            <h1>Create Post</h1>
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="title">Post Title:</label>
-                <input 
-                    type="text" 
-                    name="title"  
-                    value={title} 
-                    onChange={e => setTitle(e.target.value)}
-                    required>
-                </input>    
-                <label htmlFor="text">Content:</label>
-                <textarea 
-                    type="text" 
-                    name="text" 
-                    value={text}
-                    onChange={e => setText(e.target.value)}
-                    required>
-                </textarea>
-                <div className="published">
-                    <label htmlFor="published">Publish?</label>
+        <div className="create-container">
+            <div className="create">
+                <h1>Create Post</h1>
+                <form onSubmit={handleSubmit}>
+                    <label htmlFor="title"><h3>Post Title:</h3></label>
                     <input 
-                        type="checkbox"
-                        name="published"
-                        rows="5"
-                        columns="32"
-                        onClick={e => setPublished(!published)}>    
-                    </input>
-                </div>     
-                <button type="submit">Submit Post</button>    
-            </form>
+                        type="text" 
+                        name="title"  
+                        value={title} 
+                        onChange={e => setTitle(e.target.value)}
+                        required>
+                    </input>    
+                    <label htmlFor="text"><h3>Content:</h3></label>
+                    <textarea 
+                        type="text" 
+                        name="text" 
+                        value={text}
+                        onChange={e => setText(e.target.value)}
+                        required>
+                    </textarea>
+                    <div className="publish">
+                        <label htmlFor="published"><h3>Publish?</h3></label>
+                        <input 
+                            type="checkbox"
+                            name="published"
+                            rows="5"
+                            columns="32"
+                            onClick={e => setPublished(!published)}>    
+                        </input>
+                    </div>     
+                    <button type="submit" disabled={disable}>Submit Post</button>
+                </form>
+            </div>    
         </div>
     )
 }

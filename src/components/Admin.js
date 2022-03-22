@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router'
+import { Link } from 'react-router-dom'
 import { UserContext } from '../UserContext';
 
 function Admin({ posts, setPosts }) {
@@ -65,8 +66,21 @@ function Admin({ posts, setPosts }) {
 
     const handleEdit = (e) => {
         const post = posts.find(post => post._id === e.target.id)
-        navigate(`/posts/${post._id}/edit`)
+        navigate(`/posts/${post._id}/edit`) 
     }
+
+    function getFormattedDate(timestamp) {
+        const date = new Date(timestamp)
+        const year = date.getFullYear();
+      
+        let month = (1 + date.getMonth()).toString();
+        month = month.length > 1 ? month : '0' + month;
+      
+        let day = date.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+        
+        return month + '/' + day + '/' + year;
+      }
     
 
     return ( 
@@ -74,18 +88,26 @@ function Admin({ posts, setPosts }) {
             <h2>Admin Page</h2>
             <ul>
                 {posts.map(post =>  (
-                        <li key={post._id}>
-                            <a href={`posts/${post._id}`}>{post.title}</a> 
-                            - {post.author ? post.author.username : 'anonymous' } Published: {`${post.published}`}
-                            <button id={post._id} onClick={handleDelete}>Delete Post</button>
-                            <button id={post._id} onClick={handleEdit}>Edit Post</button>
-                            {post.published ? (
-                                    <button id={post._id} onClick={handlePubToggle}>Unpublish Post</button>
-                            ) : (
-                                    <button id={post._id} onClick={handlePubToggle}>Publish Post</button>
-                            )}
-
-                        </li>
+                    <div className={`admin-post ${post.published ? 'published' : 'unpublished'}`} key={post._id}>
+                                <Link to={`/posts/${post._id}`} className="post-img post-element" style={{textDecoration: 'none'}}>
+                                    <img className="post-img post-element" src="https://picsum.photos/100/100" alt="pic"></img>
+                                </Link>
+                                <div className="post-details post-element">
+                                    <h4 className="post-title">{post.title}</h4>
+                                    <p className="post-author">{post.author ? post.author.username : 'anonymous' }</p>
+                                    <p className="post-date">{getFormattedDate(post.timestamp)}</p>
+                                </div>
+                                <p className="post-text-preview post-element">{post.text}</p>
+                                <div className="admin-button-container post-element">    
+                                    <button className="admin-button" id={post._id} onClick={handleDelete}>Delete Post</button>
+                                    <button className="admin-button" id={post._id} onClick={handleEdit}>Edit Post</button>
+                                    {post.published ? (
+                                            <button className="admin-button" id={post._id} onClick={handlePubToggle}>Unpublish Post</button>
+                                    ) : (
+                                            <button className="admin-button" id={post._id} onClick={handlePubToggle}>Publish Post</button>
+                                    )}
+                                </div>
+                            </div>     
                     ))}
             </ul>
         </div>

@@ -15,7 +15,7 @@ function Logout() {
     })
 
     return (
-        <div>
+        <div className="logout">
             You have been logged out. Redirecting home...
         </div>
     )
