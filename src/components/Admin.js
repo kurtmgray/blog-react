@@ -37,8 +37,7 @@ function Admin({ posts, setPosts }) {
         })
         const data = await res.json()
         console.log(data)
-        getAllPosts()
-        
+        getAllPosts()  
     }
     
     const handlePubToggle = async (e) => {

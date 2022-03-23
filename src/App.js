@@ -112,7 +112,10 @@ function App() {
             </Route>
             <Route 
               path='/posts/:id' 
-              element={<SinglePost/>}  
+              element={<SinglePost
+                posts={posts} 
+                setPosts={setPosts}
+              />}  
             />  
             <Route 
               path='/posts/:id/edit' 

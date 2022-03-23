@@ -17,7 +17,6 @@ function EditPost() {
     useEffect(() => {
         const token = localStorage.getItem('token')
 
-        console.log(id)
         try{
             const getPost = async (id) => {
                 const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
@@ -30,6 +29,9 @@ function EditPost() {
                 setPost(data.post)
             }
             getPost(id)
+            if (!currentUser || !post || post.author.id !== currentUser.id) {
+                navigate(`/posts/${id}`)
+            }
         } catch (err) {
             console.error(err)
         }    
@@ -73,6 +75,10 @@ function EditPost() {
         }
     }
 
+    const handleCancel = () => {
+        navigate(`/posts/${id}`)
+    }
+
     return ( 
         <div>
             <h1>Edit Post</h1>
@@ -100,8 +106,10 @@ function EditPost() {
                     checked={published}
                     onChange={e => setPublished(!published)}>    
                 </input>
-                     
-                <button type="submit">Submit Edit</button>    
+                <div class="edit-buttons">
+                    <button onClick={handleCancel}>Cancel</button>         
+                    <button type="submit">Submit Edit</button>    
+                </div>
             </form>
         </div>
      );

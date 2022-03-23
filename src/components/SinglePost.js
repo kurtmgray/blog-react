@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { UserContext } from '../UserContext'
 import Comment from './Comment'
+import CommentForm from './CommentForm'
 import { useParams, useNavigate } from 'react-router-dom'
 
-function SinglePost() {
+function SinglePost({ posts, setPosts }) {
     const { currentUser } = useContext(UserContext)
     const { id } = useParams()
     const [userCanEdit, setUserCanEdit] = useState(false)
     const [post, setPost] = useState(null)
-    const [showCommentForm, setShowCommentForm] = useState({'display': 'none'})
-    const [newComment, setNewComment] = useState('')
+    const [showCommentForm, setShowCommentForm] = useState(false)
     const [postComments, setPostComments] = useState([])
+    const [reload, setReload] = useState(false)
 
-    const navigate = useNavigate()
+    let navigate = useNavigate()
 
     useEffect(() => {
+        setReload(false)
         const token = localStorage.getItem('token')
         const getSinglePost = async () => {
             const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
@@ -45,40 +47,62 @@ function SinglePost() {
         getSinglePost()
         getPostComments()
         canUserEdit()
-    }, [id])
+    }, [id, reload])
     
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        const token = localStorage.getItem('token')
+    const getAllPosts = async () => {
         try {
-            console.log('called')
-            const res = await fetch(`http://localhost:8000/api/posts/${id}/comments`, {
-                method: "POST",
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    Authorization: 'Bearer ' + token  
-                },
-                body: JSON.stringify({
-                    author: currentUser ? currentUser.id : 'anonymous',
-                    text: newComment,
-                    post: id
-                })
-            })
+            const res = await fetch('http://localhost:8000/api/posts')
             const data = await res.json()
-            console.log('Success', data)
-            navigate(`/posts/${id}`)
-
-        } catch(err) {
-            console.error(err)
+            setPosts(data.posts)
+        } catch (err) {
+            console.error('error fetching data', err)
         }
-        setNewComment('')
-        setShowCommentForm({'display': 'none'})
+    }
+   
+    const handleDelete = async (e) => {
+        const token = localStorage.getItem('token')
+
+        const res = await fetch(`http://localhost:8000/api/posts/${e.target.id}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
+        })
+        const data = await res.json()
+        console.log(data)
+        getAllPosts()  
     }
 
+    const handlePubToggle = async (e) => {
+        const token = localStorage.getItem('token')
+        const selectedPost = posts.find(post => post._id === e.target.id)
+        
+        const res = await fetch(`http://localhost:8000/api/posts/${e.target.id}`, {
+            method: "PATCH",
+            headers: { 
+                "Content-type": "application/json",
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                published: !selectedPost.published
+            }),
+        })
+        const data = await res.json()
+        
+        const postsCopy = [...posts]
+        const newPostIndex = posts.findIndex(post => post._id === data.updatedPost._id)
+        postsCopy.splice(newPostIndex, 1, data.updatedPost)
+        setPosts(postsCopy)
+    }
+
+    const handleEdit = (e) => {
+        const post = posts.find(post => post._id === e.target.id)
+        navigate(`/posts/${post._id}/edit`) 
+    }
+    
     const handleShowCommentForm= () => {
-        setShowCommentForm(null)
+        setShowCommentForm(true)
     }
-
 
     console.log(post)
     
@@ -99,36 +123,32 @@ function SinglePost() {
                                     key={comment._id}
                                     postId={id}
                                     commentId={comment._id}
+                                    setReload={setReload}
                                 />
                             ))}
                         </div>) 
                     : null }
-                    <button onClick={handleShowCommentForm}>Add Comment</button>
-                    {userCanEdit ? (
+                    {!showCommentForm ? (
+                        <button onClick={handleShowCommentForm} >Add Comment</button>
+                    ) : (    <CommentForm 
+                            id={id}
+                            setShowCommentForm={setShowCommentForm}
+                            setReload={setReload}
+                        />
+                    )}
+                    {userCanEdit &&
                         <div className="single-post-buttons">
-                            <button id={post._id} onClick={console.log('delete')}>Delete Post</button>
-                            <button id={post._id} onClick={console.log('edit')}>Edit Post</button>
+                            <button id={post._id} onClick={handleDelete}>Delete Post</button>
+                            <button id={post._id} onClick={handleEdit}>Edit Post</button>
                             {post.published ? (
-                                    <button id={post._id} onClick={console.log('unpublish')}>Unpublish Post</button>
+                                    <button id={post._id} onClick={handlePubToggle}>Unpublish Post</button>
                             ) : (
-                                    <button id={post._id} onClick={console.log('publish')}>Publish Post</button>
+                                    <button id={post._id} onClick={handlePubToggle}>Publish Post</button>
                             )}
                         </div>    
-                    ) : null}
+                    }
                 </div>
-                <div style={showCommentForm}>
-                    <form onSubmit={handleSubmit}>
-                        <label htmlFor="title">Comment:</label>
-                        <textarea 
-                            type="text" 
-                            name="comment" 
-                            value={newComment}
-                            onChange={e => setNewComment(e.target.value)}
-                            required>
-                        </textarea>
-                        <button type="submit">Post Comment</button>    
-                    </form>
-                </div>
+                
             </div>
         )
     } 
