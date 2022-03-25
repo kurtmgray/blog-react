@@ -1,39 +1,23 @@
-import React, {useState, useEffect, useContext} from 'react';
-import { UserContext } from '../UserContext';
+import React, { useEffect } from 'react';
 
-function EditCommentForm({postId, commentId, setEditMode}) {
-    const { currentUser } = useContext(UserContext)
-    const [comment, setComment] = useState()
+function EditCommentForm({ comment, editedComment, setEditedComment, toggleEditMode, onSaveEdit }) {
 
     useEffect (() => {
-        const getComment = async () => {
-            const res = await fetch()
-
-            const data = res.json()
-            setComment(data.comment)
-        }
-        getComment()
-    })
-    
-    
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        setEditMode(false)
-
-        const res = await fetch()
-    }
+        setEditedComment(comment.text)
+    },[])
     
     return ( 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={onSaveEdit}>
             <label htmlFor="title">Comment:</label>
             <textarea 
                 type="text" 
                 name="comment" 
-                value={comment}
-                onChange={e => setComment(e.target.value)}
+                value={editedComment}
+                onChange={e => setEditedComment(e.target.value)}
                 required>
             </textarea>
-            <button type="submit">Submit Edit</button>    
+            <button onClick={toggleEditMode}>Cancel</button>
+            <button type="submit">Save</button>    
         </form>
      );
 }

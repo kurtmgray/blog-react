@@ -11,43 +11,46 @@ function SinglePost({ posts, setPosts }) {
     const [post, setPost] = useState(null)
     const [showCommentForm, setShowCommentForm] = useState(false)
     const [postComments, setPostComments] = useState([])
-    const [reload, setReload] = useState(false)
+    const [newComment, setNewComment] = useState('')
+    const [editedComment, setEditedComment] = useState()
+
 
     let navigate = useNavigate()
 
-    useEffect(() => {
-        setReload(false)
-        const token = localStorage.getItem('token')
-        const getSinglePost = async () => {
-            const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
-                headers: {
-                    Authorization: 'Bearer ' + token 
-                }
-            })
-            const data = await res.json()
-            setPost(data.post)
-        }
-        const getPostComments = async () => {
-            const res = await fetch(`http://localhost:8000/api/posts/${id}/comments`, {
-                headers: {
-                    Authorization: 'Bearer ' + token
-                }
-            })
-            const data= await res.json()
-            setPostComments(data.comments)
-        }
-        const canUserEdit = async () => {
-            if ((currentUser && currentUser.admin) || 
-            (currentUser && (currentUser.id === await post.author._id))) {
-                setUserCanEdit(true)
-            } else {
-                setUserCanEdit(false)
+    const getSinglePost = async (token) => {
+        const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
+            headers: {
+                Authorization: 'Bearer ' + token 
             }
+        })
+        const data = await res.json()
+        setPost(data.post)
+    }
+    const getPostComments = async (token) => {
+        const res = await fetch(`http://localhost:8000/api/posts/${id}/comments`, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+        const data= await res.json()
+        setPostComments(data.comments)
+    }
+    const canUserEdit = async () => {
+        if ((currentUser && currentUser.admin) || 
+        (currentUser && (currentUser.id === await post.author._id))) {
+            setUserCanEdit(true)
+        } else {
+            setUserCanEdit(false)
         }
-        getSinglePost()
-        getPostComments()
+    }
+
+    useEffect(() => {
+        console.log(newComment)
+        const token = localStorage.getItem('token')
+        getSinglePost(token)
+        getPostComments(token)
         canUserEdit()
-    }, [id, reload])
+    }, [id])
     
     const getAllPosts = async () => {
         try {
@@ -59,7 +62,7 @@ function SinglePost({ posts, setPosts }) {
         }
     }
    
-    const handleDelete = async (e) => {
+    const handleDeletePost = async (e) => {
         const token = localStorage.getItem('token')
 
         const res = await fetch(`http://localhost:8000/api/posts/${e.target.id}`, {
@@ -95,7 +98,7 @@ function SinglePost({ posts, setPosts }) {
         setPosts(postsCopy)
     }
 
-    const handleEdit = (e) => {
+    const handleEditPost = (e) => {
         const post = posts.find(post => post._id === e.target.id)
         navigate(`/posts/${post._id}/edit`) 
     }
@@ -104,8 +107,79 @@ function SinglePost({ posts, setPosts }) {
         setShowCommentForm(true)
     }
 
-    console.log(post)
-    
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        const token = localStorage.getItem('token')
+        try {
+            console.log('called')
+            const res = await fetch(`http://localhost:8000/api/posts/${id}/comments`, {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    Authorization: 'Bearer ' + token  
+                },
+                body: JSON.stringify({
+                    author: currentUser ? currentUser.id : 'anonymous',
+                    text: newComment,
+                    post: id
+                })
+            })
+            const data = await res.json()
+            console.log('Success', data)
+            const postCommentsCopy = [...postComments]
+            const newCommentIndex = postComments.findIndex(post => post._id === data.comment._id)
+            postCommentsCopy.splice(newCommentIndex, 1, data.comment)
+            setPostComments(postCommentsCopy)
+            
+        } catch(err) {
+            console.error(err)
+        }
+        setNewComment('')
+        setShowCommentForm(false)
+    }
+
+    const handleDeleteComment = async (e) => {
+        const token = localStorage.getItem('token')
+        console.log(token)
+        try {
+            const res = await fetch(`http://localhost:8000/api/posts/${id}/comments/${e.target.id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: 'Bearer ' + token
+                },
+            })
+            const data = await res.json()
+            console.log(data)
+            getPostComments(token)
+
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const handleSaveEdit = async (e) => {
+        const token = localStorage.getItem('token')
+        console.log(token)
+        try {
+            const res = await fetch(`http://localhost:8000/api/posts/${id}/comments/${e.target.id}`, {
+                method: "PATCH",
+                headers: {
+                    Authorization: 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    text: newComment
+                })
+            })
+            const data = await res.json()
+            console.log(data)
+            getPostComments(token)
+
+        } catch (err) {
+            console.log(err)
+        }
+        //setEditMode(false)
+    }
+
     if(!post) return (<p>loading...</p>)
     else {
         return (
@@ -121,25 +195,29 @@ function SinglePost({ posts, setPosts }) {
                             {postComments.map(comment => (
                                 <Comment 
                                     key={comment._id}
-                                    postId={id}
-                                    commentId={comment._id}
-                                    setReload={setReload}
+                                    comment={comment}
+                                    onDelete={handleDeleteComment}
+                                    onSaveEdit={handleSaveEdit}
+                                    editedComment={editedComment}
+                                    setEditedComment={setEditedComment}
+
                                 />
                             ))}
                         </div>) 
                     : null }
                     {!showCommentForm ? (
                         <button onClick={handleShowCommentForm} >Add Comment</button>
-                    ) : (    <CommentForm 
-                            id={id}
-                            setShowCommentForm={setShowCommentForm}
-                            setReload={setReload}
+                    ) : ( <CommentForm 
+                            value={newComment}
+                            onChange={setNewComment}
+                            onSubmit={handleSubmit}
+                        
                         />
                     )}
                     {userCanEdit &&
                         <div className="single-post-buttons">
-                            <button id={post._id} onClick={handleDelete}>Delete Post</button>
-                            <button id={post._id} onClick={handleEdit}>Edit Post</button>
+                            <button id={post._id} onClick={handleDeletePost}>Delete Post</button>
+                            <button id={post._id} onClick={handleEditPost}>Edit Post</button>
                             {post.published ? (
                                     <button id={post._id} onClick={handlePubToggle}>Unpublish Post</button>
                             ) : (

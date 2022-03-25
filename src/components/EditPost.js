@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom'
 
 function EditPost() {
     const { currentUser } = useContext(UserContext)
-    const [post, setPost] = useState({})
+    const [post, setPost] = useState(null)
     const [title, setTitle] = useState('')    
     const [text, setText] = useState('')
     const [published, setPublished] = useState(false)    
@@ -14,34 +14,36 @@ function EditPost() {
 
     let navigate = useNavigate()
 
-    useEffect(() => {
+    const getPost = async (id) => {
         const token = localStorage.getItem('token')
+        const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
+            headers: {
+                Authorization: 'Bearer ' + token 
+            }
+        })
+        const data = await res.json()
+        console.log(data)
+        return data.post
+    }
 
-        try{
-            const getPost = async (id) => {
-                const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
-                    headers: {
-                        Authorization: 'Bearer ' + token 
-                    }
-                })
-                const data = await res.json()
-                console.log(data)
-                setPost(data.post)
-            }
-            getPost(id)
-            if (!currentUser || !post || post.author.id !== currentUser.id) {
-                navigate(`/posts/${id}`)
-            }
-        } catch (err) {
-            console.error(err)
-        }    
-    }, [id])
-    
     useEffect(() => {
-        setTitle(post.title)
-        setText(post.text)
-        setPublished(post.published)
-    }, [post])
+        const init = async () => {
+            try{
+                const postData = await getPost(id)
+                if (!currentUser || !postData || postData.author._id !== currentUser.id) {
+                    navigate(`/posts/${id}`)
+                    return
+                }
+                setPost(postData)
+                setTitle(postData.title)
+                setText(postData.text)
+                setPublished(postData.published)
+            } catch (err) {
+                console.error(err)
+            }    
+        }
+        init()
+    }, [id])
 
     console.log(title, text, published)
 
@@ -79,6 +81,8 @@ function EditPost() {
         navigate(`/posts/${id}`)
     }
 
+    if (!post) return null
+
     return ( 
         <div>
             <h1>Edit Post</h1>
@@ -112,7 +116,8 @@ function EditPost() {
                 </div>
             </form>
         </div>
-     );
+    )
 }
+
 
 export default EditPost;
