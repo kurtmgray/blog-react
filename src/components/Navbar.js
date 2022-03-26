@@ -15,7 +15,6 @@ function Navbar() {
             </div>
             <div className='navbar-links'>
                 <h3 className='navbar-link'><Link to='/'>Home  </Link></h3>
-                <h3 className='navbar-link'><Link to='/create'>Create  </Link></h3>
                 {!currentUser ? (
                     <div className='navbar-links'>
                         <h3 className='navbar-link'><Link to='/signup'>Sign Up  </Link></h3>
@@ -23,6 +22,7 @@ function Navbar() {
                     </div>
                 ) : (
                     <div className='navbar-links'>
+                        <h3 className='navbar-link'><Link to='/create'>Create  </Link></h3>
                         <h3 className='navbar-link'><Link to='/dashboard'>Dashboard  </Link></h3>
                         <h3 className='navbar-link'><Link to='/logout'>Log Out</Link></h3>
                     </div> 

@@ -153,7 +153,8 @@
   align-items: center;
 }
 
-.comment {
+.comment,
+.comment-edit-inline {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -163,12 +164,27 @@
 }
 
 .comment-text {
-  font-weight: bold;
+  font-size: 1.1em;
+  font-weight: 500;
+  margin: 2px
 }
 
 .comment-details {
   text-align: right;
   font-style: italic;
+  margin-left: auto
+}
+
+.comment-date, 
+.comment-author {
+  margin: 10px;
+  text-align: end;
+  align-self: flex-end;
+}
+
+.comment-tools {
+  display: flex;
+  justify-content: space-between
 }
 
 .comment-container {
@@ -192,17 +208,41 @@ input[type="checkbox"] {
   padding: .5rem
 }
 
-textarea {
+textarea.new-post {
   display: block;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  width: 40rem;
-  height: 20rem;
+  width: 400px;
+  height: 400px;
   padding: .5rem;
   font-size: 1.1em;
-  font-weight: 500
+  font-weight: 500;
+  border-radius: 10px
 }
 
-form:not([label]) {
+textarea.new-comment {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  width: 400px;
+  height: 100px;
+  padding: .5rem;
+  font-size: 1.1em;
+  font-weight: 500;
+  border-radius: 10px
+}
+
+textarea.edit-comment {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  width: 392px;
+  border-radius: 5px;
+  border: none;
+  background-color: #f8f8f8;
+  font-size: 1.1em;
+  font-weight: 500;
+  overflow: auto;
+  resize: horizontal;
+}
+
+form:not([label]):not(.comment) {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -213,7 +253,7 @@ label {
   padding: .2rem
 }
 
-button:not([class="admin-button"]) {
+/* button:not(.admin-button):not(.edit-button) {
   border: none;
   margin: 1rem;
   padding: .5rem;
@@ -221,21 +261,24 @@ button:not([class="admin-button"]) {
   font-size: 1.2em;
   border-radius: 0.2rem;
   cursor: pointer;
+} */
+
+.admin-button-container,
+.comment-edit-buttons  {
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+width: 164px;
+margin: 5px;
+align-self: flex-end;
 }
 
-.admin-button-container {
-  display: flex;
-  flex-direction: column;
-  margin-right: auto;
-  width: 164px
-}
-
-.admin-button {
+.admin-button, 
+.edit-button {
   border: none;
   margin: .2rem;
-  /* margin-right: auto; */
   padding: .2rem;
-  width: 10rem;
+  width: 5rem;
   font-size: .8em;
   border-radius: 0.2rem;
   cursor: pointer;

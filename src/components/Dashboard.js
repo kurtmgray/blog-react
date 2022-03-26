@@ -51,6 +51,10 @@ function Dashboard() {
         const data = await res.json()
         await setCurrentUser(data.user)
     }
+
+    const preview = (text) => {
+        return text.slice(0, 200) + '...'
+    }
     
     return (
         <div>
@@ -62,11 +66,14 @@ function Dashboard() {
                         <hr/> 
                             {published ? (
                                 published.map(post => 
-                                    <Link to={`/posts/${post._id}`} style={{textDecoration: 'none'}}>
-                                        <div className="dashboard-post post-element" key={post._id}>
+                                    <Link to={`/posts/${post._id}`} key={post._id} style={{textDecoration: 'none'}}>
+                                        <div className="dashboard-post post-element" >
                                             <img className="db-post-img post-element" src="https://picsum.photos/100/100" alt="pic"></img>
-                                            <h4 className="db-post-title post-element">{post.title}</h4>
-                                            <p className="db-text-preview post-element">{post.text}</p>
+                                            <div>
+                                                <h4 className="db-post-title post-element">{post.title}</h4>
+                                                <p className="db-text-preview post-element">{preview(post.text)}</p>
+                                                <p className="post-element" style={{fontStyle:'italic'}}>read more...</p>
+                                            </div>    
                                         </div>     
                                     </Link>
                                 )

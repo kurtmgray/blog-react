@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { UserContext } from '../UserContext'
 import { useNavigate } from 'react-router'
-
+import { Editor } from '@tinymce/tinymce-react'
 
 function Create({posts, setPosts}) {
     const [title, setTitle] = useState('')    
@@ -10,8 +10,10 @@ function Create({posts, setPosts}) {
     const [disable, setDisable] = useState(true)
     const { currentUser } = useContext(UserContext)
     let navigate = useNavigate()
-
-    console.log(currentUser)
+    
+    useEffect(() => {
+        title && text ? setDisable(false) : setDisable(true)
+    }, [title, text])
     
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -41,9 +43,29 @@ function Create({posts, setPosts}) {
         setText('')
     }
 
-    useEffect(() => {
-        title && text ? setDisable(false) : setDisable(true)
-    }, [title, text])
+    const parseEditorData = (content, editor) => {
+        console.log("content", content)
+        console.log("editor", editor)
+        const { targetElm } = editor;
+        const { name } = targetElm;
+        setText(content)
+        return {
+            target: {
+                name,
+                value: content,
+            },
+        };
+    };
+    
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    
+    //     setFormData((prevState) => ({
+    //       ...prevState,
+    //       [name]: value,
+    //     }));
+    //   };
+    
 
     console.log(title, text)
 
@@ -61,13 +83,33 @@ function Create({posts, setPosts}) {
                         required>
                     </input>    
                     <label htmlFor="text"><h3>Content:</h3></label>
-                    <textarea 
+                    <Editor
+                        apiKey="vs2svkfmnbjh55w224iibrp0wuz7u8oj90t57boctnrbcgrg"
+                        init={{
+                            // width: 800,
+                            height: 400,
+                            menubar: false,
+                            plugins: [
+                                "advlist autolink lists link image",
+                                "charmap print preview anchor help",
+                                "searchreplace visualblocks code",
+                                "insertdatetime media table paste wordcount",
+                            ],
+                            toolbar:
+                                // prettier-ignore
+                                "undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help",
+                        }}
+                        value={text}
+                        textareaName="content"
+                        onEditorChange={(content, editor) => parseEditorData(content, editor)}
+                    ></Editor>
+                    {/* <textarea className="new-post"
                         type="text" 
                         name="text" 
                         value={text}
                         onChange={e => setText(e.target.value)}
                         required>
-                    </textarea>
+                    </textarea> */}
                     <div className="publish">
                         <label htmlFor="published"><h3>Publish?</h3></label>
                         <input 

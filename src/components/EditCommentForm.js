@@ -5,20 +5,31 @@ function EditCommentForm({ comment, editedComment, setEditedComment, toggleEditM
     useEffect (() => {
         setEditedComment(comment.text)
     },[])
+
+    const onSubmit = (e) => {
+        onSaveEdit(e) 
+        toggleEditMode()
+    }
+
+    if (!editedComment) return "Loading..."
     
     return ( 
-        <form onSubmit={onSaveEdit}>
-            <label htmlFor="title">Comment:</label>
-            <textarea 
-                type="text" 
-                name="comment" 
-                value={editedComment}
-                onChange={e => setEditedComment(e.target.value)}
-                required>
-            </textarea>
-            <button onClick={toggleEditMode}>Cancel</button>
-            <button type="submit">Save</button>    
-        </form>
+        <div >
+            <form className="comment" onSubmit={onSubmit} id={comment._id}>
+                <textarea 
+                    className="edit-comment"
+                    type="text" 
+                    name="comment" 
+                    value={editedComment}
+                    onChange={e => setEditedComment(e.target.value)}
+                    required>
+                </textarea>
+                <div className="admin-button-container">
+                    <button className="admin-button" onClick={toggleEditMode}>Cancel</button>
+                    <button className="admin-button" type="submit">Save</button>
+                </div>    
+            </form>
+        </div>
      );
 }
 

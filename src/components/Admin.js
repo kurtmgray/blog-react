@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../UserContext';
+import { format, parseISO } from 'date-fns'
 
 function Admin({ posts, setPosts }) {
     const { currentUser } = useContext(UserContext)
@@ -69,17 +70,12 @@ function Admin({ posts, setPosts }) {
     }
 
     function getFormattedDate(timestamp) {
-        const date = new Date(timestamp)
-        const year = date.getFullYear();
-      
-        let month = (1 + date.getMonth()).toString();
-        month = month.length > 1 ? month : '0' + month;
-      
-        let day = date.getDate().toString();
-        day = day.length > 1 ? day : '0' + day;
-        
-        return month + '/' + day + '/' + year;
-      }
+        return format(parseISO(timestamp), "MMMM dd" );
+    }
+
+    const preview = (text) => {
+        return text.slice(0, 200) + '...'
+    }
     
 
     return ( 
@@ -96,14 +92,14 @@ function Admin({ posts, setPosts }) {
                                     <p className="post-author">{post.author ? post.author.username : 'anonymous' }</p>
                                     <p className="post-date">{getFormattedDate(post.timestamp)}</p>
                                 </div>
-                                <p className="post-text-preview post-element">{post.text}</p>
+                                <p className="post-text-preview post-element">{preview(post.text)}</p>
                                 <div className="admin-button-container post-element">    
-                                    <button className="admin-button" id={post._id} onClick={handleDelete}>Delete Post</button>
-                                    <button className="admin-button" id={post._id} onClick={handleEdit}>Edit Post</button>
+                                    <button className="admin-button" id={post._id} onClick={handleDelete}>Delete</button>
+                                    <button className="admin-button" id={post._id} onClick={handleEdit}>Edit</button>
                                     {post.published ? (
-                                            <button className="admin-button" id={post._id} onClick={handlePubToggle}>Unpublish Post</button>
+                                            <button className="admin-button" id={post._id} onClick={handlePubToggle}>Unpublish</button>
                                     ) : (
-                                            <button className="admin-button" id={post._id} onClick={handlePubToggle}>Publish Post</button>
+                                            <button className="admin-button" id={post._id} onClick={handlePubToggle}>Publish</button>
                                     )}
                                 </div>
                             </div>     
