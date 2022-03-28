@@ -25,7 +25,7 @@ function Home({ posts }) {
                 {publishedPosts.map(post => 
                     (
                         <div className="post-card" key={post._id}>
-                            <img className="post-img" src="https://picsum.photos/300/300" alt='pic'/>
+                            <img className="post-img" src={post.imgUrl} alt='pic'/>
                             <h3 className="post-title">
                                 <a href={`/posts/${post._id}`}>{post.title}</a>
                                 {post.author ? post.author.username : 'anonymous' }

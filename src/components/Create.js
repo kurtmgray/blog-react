@@ -3,9 +3,10 @@ import { UserContext } from '../UserContext'
 import { useNavigate } from 'react-router'
 import { Editor } from '@tinymce/tinymce-react'
 
-function Create({posts, setPosts}) {
+function Create() {
     const [title, setTitle] = useState('')    
-    const [text, setText] = useState('')    
+    const [text, setText] = useState('')
+    const [imgUrl, setImgUrl] = useState('')    
     const [published, setPublished] = useState(false)
     const [disable, setDisable] = useState(true)
     const { currentUser } = useContext(UserContext)
@@ -28,8 +29,10 @@ function Create({posts, setPosts}) {
                 body: JSON.stringify({
                     author: currentUser ? currentUser.id : null,
                     title: title,
+                    imgUrl: imgUrl,
                     text: text,
-                    published: published
+                    published: published,
+
                 })
             })
             const data = await res.json()
@@ -43,30 +46,6 @@ function Create({posts, setPosts}) {
         setText('')
     }
 
-    const parseEditorData = (content, editor) => {
-        console.log("content", content)
-        console.log("editor", editor)
-        const { targetElm } = editor;
-        const { name } = targetElm;
-        setText(content)
-        return {
-            target: {
-                name,
-                value: content,
-            },
-        };
-    };
-    
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    
-    //     setFormData((prevState) => ({
-    //       ...prevState,
-    //       [name]: value,
-    //     }));
-    //   };
-    
-
     console.log(title, text)
 
     return (
@@ -74,19 +53,27 @@ function Create({posts, setPosts}) {
             <div className="create">
                 <h1>Create Post</h1>
                 <form onSubmit={handleSubmit}>
-                    <label htmlFor="title"><h3>Post Title:</h3></label>
+                    <label className="title" htmlFor="title"><h3>Post Title:</h3></label>
                     <input 
+                        className="title-input"
                         type="text" 
                         name="title"  
                         value={title} 
                         onChange={e => setTitle(e.target.value)}
                         required>
-                    </input>    
-                    <label htmlFor="text"><h3>Content:</h3></label>
+                    </input>
+                    <label className="imgUrl" htmlFor="imgUrl"><h3>Image URL:</h3></label>
+                    <input 
+                        className="imgUrl-input"
+                        type="text" 
+                        name="imgUrl"  
+                        value={imgUrl} 
+                        onChange={e => setImgUrl(e.target.value)}>
+                    </input>        
+                    <label className="text-input" htmlFor="text"><h3>Content:</h3></label>
                     <Editor
                         apiKey="vs2svkfmnbjh55w224iibrp0wuz7u8oj90t57boctnrbcgrg"
                         init={{
-                            // width: 800,
                             height: 400,
                             menubar: false,
                             plugins: [
@@ -101,7 +88,7 @@ function Create({posts, setPosts}) {
                         }}
                         value={text}
                         textareaName="content"
-                        onEditorChange={(content, editor) => parseEditorData(content, editor)}
+                        onEditorChange={(content) => setText(content)}
                     ></Editor>
                     {/* <textarea className="new-post"
                         type="text" 

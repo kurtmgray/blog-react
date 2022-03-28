@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../UserContext';
 import { useNavigate } from 'react-router'
 import { useParams } from 'react-router-dom'
+import { Editor } from '@tinymce/tinymce-react'
 
 
 function EditPost() {
@@ -65,6 +66,7 @@ function EditPost() {
                     title: title,
                     text: text,
                     published: published,
+                    imgUrl: post.imgUrl,
                     timestamp: post.timestamp
                 })
             })
@@ -95,14 +97,34 @@ function EditPost() {
                     onChange={e => setTitle(e.target.value)}
                     required>
                 </input>    
-                <label htmlFor="text">Content:</label>
+                <label className="text-input" htmlFor="text"><h3>Content:</h3></label>
+                    <Editor
+                        apiKey="vs2svkfmnbjh55w224iibrp0wuz7u8oj90t57boctnrbcgrg"
+                        init={{
+                            height: 400,
+                            menubar: false,
+                            plugins: [
+                                "advlist autolink lists link image",
+                                "charmap print preview anchor help",
+                                "searchreplace visualblocks code",
+                                "insertdatetime media table paste wordcount",
+                            ],
+                            toolbar:
+                                // prettier-ignore
+                                "undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help",
+                        }}
+                        value={text}
+                        textareaName="content"
+                        onEditorChange={(content) => setText(content)}
+                    ></Editor>
+                {/* <label htmlFor="text">Content:</label>
                 <textarea 
                     type="text" 
                     name="text" 
                     value={text}
                     onChange={e => setText(e.target.value)}
                     required>
-                </textarea>
+                </textarea> */}
                 <label htmlFor="published">Publish?</label>
                 <input 
                     type="checkbox"

@@ -1,13 +1,14 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../UserContext';
 import { format, parseISO } from 'date-fns'
+import parse from 'html-react-parser'
+
 
 function Admin({ posts, setPosts }) {
     const { currentUser } = useContext(UserContext)
     let navigate = useNavigate()
-    console.log( currentUser)
     
     useEffect(() => {
         getAllPosts()
@@ -82,28 +83,32 @@ function Admin({ posts, setPosts }) {
         <div>
             <h2>Admin Page</h2>
             <ul>
-                {posts.map(post =>  (
-                    <div className={`admin-post ${post.published ? 'published' : 'unpublished'}`} key={post._id}>
-                                <Link to={`/posts/${post._id}`} className="post-img post-element" style={{textDecoration: 'none'}}>
-                                    <img className="post-img post-element" src="https://picsum.photos/100/100" alt="pic"></img>
-                                </Link>
-                                <div className="post-details post-element">
-                                    <h4 className="post-title">{post.title}</h4>
-                                    <p className="post-author">{post.author ? post.author.username : 'anonymous' }</p>
-                                    <p className="post-date">{getFormattedDate(post.timestamp)}</p>
-                                </div>
-                                <p className="post-text-preview post-element">{preview(post.text)}</p>
-                                <div className="admin-button-container post-element">    
-                                    <button className="admin-button" id={post._id} onClick={handleDelete}>Delete</button>
-                                    <button className="admin-button" id={post._id} onClick={handleEdit}>Edit</button>
-                                    {post.published ? (
-                                            <button className="admin-button" id={post._id} onClick={handlePubToggle}>Unpublish</button>
-                                    ) : (
-                                            <button className="admin-button" id={post._id} onClick={handlePubToggle}>Publish</button>
-                                    )}
-                                </div>
-                            </div>     
-                    ))}
+                {posts.length > 0 ? (
+                    posts.map(post =>  (
+                        <div className={`admin-post ${post.published ? 'published' : 'unpublished'}`} key={post._id}>
+                                    <Link to={`/posts/${post._id}`} className="post-img post-element" style={{textDecoration: 'none'}}>
+                                        <img className="post-img post-element" src={post.imgUrl} alt="pic"></img>
+                                    </Link>
+                                    <div className="post-details post-element">
+                                        <h4 className="post-title">{post.title}</h4>
+                                        <p className="post-author">{post.author ? post.author.username : 'anonymous' }</p>
+                                        <p className="post-date">{getFormattedDate(post.timestamp)}</p>
+                                    </div>
+                                    <p className="post-text-preview post-element">{parse(preview(post.text))}</p>
+                                    <div className="admin-button-container post-element">    
+                                        <button className="admin-button" id={post._id} onClick={handleDelete}>Delete</button>
+                                        <button className="admin-button" id={post._id} onClick={handleEdit}>Edit</button>
+                                        {post.published ? (
+                                                <button className="admin-button" id={post._id} onClick={handlePubToggle}>Unpublish</button>
+                                        ) : (
+                                                <button className="admin-button" id={post._id} onClick={handlePubToggle}>Publish</button>
+                                        )}
+                                    </div>
+                                </div>     
+                        ))
+                ) : ( 
+                    <p>There are no posts to display.</p>
+                )}
             </ul>
         </div>
      );

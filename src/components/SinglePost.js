@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { UserContext } from '../UserContext'
 import Comment from './Comment'
 import CommentForm from './CommentForm'
-import { formatDistance } from 'date-fns'
+import parse from 'html-react-parser'
 
 function SinglePost({ posts, setPosts }) {
     const { currentUser } = useContext(UserContext)
@@ -98,9 +98,9 @@ function SinglePost({ posts, setPosts }) {
         setPosts(postsCopy)
     }
 
-    const handleEditPost = (e) => {
-        const post = posts.find(post => post._id === e.target.id)
-        navigate(`/posts/${post._id}/edit`) 
+    const handleEditPost = () => {
+        // const post = posts.find(post => post._id === e.target.id)
+        navigate(`/posts/${id}/edit`) 
     }
 
     const handleSubmitComment = async (e) => {
@@ -185,9 +185,11 @@ function SinglePost({ posts, setPosts }) {
         return (
             <div>    
                 <div className="single-post-container">
-                    <img className="post-img" src="https://picsum.photos/600/400" alt='pic'/>
+                    <img className="post-img" src={post.imgUrl} alt='pic'/>
                     <h3>{post.title}</h3>
-                    <p >{post.text}</p>
+                    <div>
+                        {parse(post.text)}
+                    </div>
                     {post.author ? <p>{post.author.fname}</p> : null }
                     {postComments.length ? (
                         <div className="comment-container">

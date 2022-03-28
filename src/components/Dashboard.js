@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../UserContext';
+import parse from 'html-react-parser'
+
 
 function Dashboard() {
     const {currentUser, setCurrentUser} = useContext(UserContext)
@@ -64,25 +66,27 @@ function Dashboard() {
                     <div className="dashboard-posts-container">
                         <h3>Published Posts</h3>
                         <hr/> 
-                            {published ? (
+                            {published && published.length > 0 ? (
                                 published.map(post => 
                                     <Link to={`/posts/${post._id}`} key={post._id} style={{textDecoration: 'none'}}>
                                         <div className="dashboard-post post-element" >
-                                            <img className="db-post-img post-element" src="https://picsum.photos/100/100" alt="pic"></img>
+                                            <img className="db-post-img post-element" src={post.imgUrl} alt="pic"></img>
                                             <div>
                                                 <h4 className="db-post-title post-element">{post.title}</h4>
-                                                <p className="db-text-preview post-element">{preview(post.text)}</p>
+                                                <div className="db-text-preview post-element">
+                                                    {parse(preview(post.text), { trim: true })}
+                                                </div>
                                                 <p className="post-element" style={{fontStyle:'italic'}}>read more...</p>
                                             </div>    
                                         </div>     
                                     </Link>
                                 )
                             ) : (
-                                <p>You have no published posts</p> 
+                                <p>You have no published posts.</p> 
                             )} 
                         <h3>Unpublished Posts</h3>
                         <hr/> 
-                            {unpublished ? (
+                            {unpublished && unpublished.length > 0 ? (
                                 unpublished.map(post =>
                                     <Link to={`/posts/${post._id}`} style={{textDecoration: 'none'}}> 
                                         <div className="dashboard-post post-element" key={post._id}>
@@ -94,7 +98,7 @@ function Dashboard() {
 
                                 )
                             ) : (
-                                <p>You have no unpublished posts</p>
+                                <p>You have no unpublished posts.</p>
                             )}
                     </div>
                 </div>
