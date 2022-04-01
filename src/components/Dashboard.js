@@ -3,59 +3,33 @@ import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../UserContext';
 import parse from 'html-react-parser'
+import {
+    usePostData,
+
+} from '../hooks/usePostData'
 
 
-function Dashboard() {
+function Dashboard({ posts }) {
     const {currentUser, setCurrentUser} = useContext(UserContext)
-    
     const [published, setPublished] = useState(null)
     const [unpublished, setUnpublished] = useState(null)
     
     let navigate = useNavigate()
     
+    // const { data: posts } = usePostData()
+    
     useEffect(() => {
-        const token = localStorage.getItem('token')
-        if (currentUser) {
-            getPosts(token)
-        }
-        else if (token) {
-            getUser(token)
-            getPosts(token)
-        } 
-        else {
-            setCurrentUser(null)
+        if (!currentUser) {
             navigate('/login')
         }
-    }, [currentUser])
+        setPublished(posts.filter(post => post.published))
+        setUnpublished(posts.filter(post => !post.published))
+    }, [])
     
-    const getPosts = async (token) => {
-        const res = await fetch(`http://localhost:8000/api/users/${currentUser.id}/posts`, {
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        })
-        const data = await res.json()
-        const timeSortedPublishedPosts = 
-            data.posts.published.sort((a, b) => (b.timestamp > a.timestamp) ? 1 : -1)
-        const timeSortedUnpublishedPosts = 
-            data.posts.unpublished.sort((a, b) => (b.timestamp > a.timestamp) ? 1 : -1)
-        
-        setPublished(timeSortedPublishedPosts)
-        setUnpublished(timeSortedUnpublishedPosts)
-    }
-    
-    const getUser = async (token) => {
-        const res = await fetch(`http://localhost:8000/api/users`, {
-            headers: { 
-                Authorization: token 
-            },
-        })
-        const data = await res.json()
-        await setCurrentUser(data.user)
-    }
+
 
     const preview = (text) => {
-        return text.slice(0, 200) + '...'
+        return text.slice(0, 200)+'...'
     }
     
     return (
@@ -70,7 +44,7 @@ function Dashboard() {
                                 published.map(post => 
                                     <Link to={`/posts/${post._id}`} key={post._id} style={{textDecoration: 'none'}}>
                                         <div className="dashboard-post post-element" >
-                                            <img className="db-post-img post-element" src={post.imgUrl} alt="pic"></img>
+                                            <img className="db-post-img post-element" src={post.imgUrl ? post.imgUrl : 'https://picsum.photos/200/300'} alt="pic"></img>
                                             <div>
                                                 <h4 className="db-post-title post-element">{post.title}</h4>
                                                 <div className="db-text-preview post-element">
@@ -88,12 +62,17 @@ function Dashboard() {
                         <hr/> 
                             {unpublished && unpublished.length > 0 ? (
                                 unpublished.map(post =>
-                                    <Link to={`/posts/${post._id}`} style={{textDecoration: 'none'}}> 
-                                        <div className="dashboard-post post-element" key={post._id}>
-                                            <img className="db-post-img post-element" src="https://picsum.photos/100/100" alt="pic"></img>
-                                            <h4 className="db-post-title post-element">{post.title}</h4>
-                                            <p className="db-text-preview post-element">{post.text}</p>
-                                        </div>
+                                    <Link to={`/posts/${post._id}`} key={post._id} style={{textDecoration: 'none'}}> 
+                                        <div className="dashboard-post post-element" >
+                                            <img className="db-post-img post-element" src={post.imgUrl ? post.imgUrl : 'https://picsum.photos/200/300'} alt="pic"></img>
+                                            <div>
+                                                <h4 className="db-post-title post-element">{post.title}</h4>
+                                                <div className="db-text-preview post-element">
+                                                    {parse(preview(post.text), { trim: true })}
+                                                </div>
+                                                <p className="post-element" style={{fontStyle:'italic'}}>read more...</p>
+                                            </div>
+                                        </div>    
                                     </Link>
 
                                 )

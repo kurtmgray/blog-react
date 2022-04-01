@@ -12,15 +12,12 @@ import SinglePost from './components/SinglePost'
 import EditPost from './components/EditPost';
 import Logout from './components/Logout'
 import { UserContext } from './UserContext';
+import { usePostData } from './hooks/usePostData';
+import { ReactQueryDevtools } from 'react-query-devtools'
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null)
-  const [posts, setPosts] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState()
-
   const value = useMemo(() => ({currentUser, setCurrentUser}), [currentUser, setCurrentUser])
-
   useEffect(() => {
     const token = localStorage.getItem('token')
         
@@ -44,88 +41,83 @@ function App() {
     }
   }, [])
 
-  useEffect( () => {
-    const getAllPosts = async () => {
-      try {
-        const res = await fetch('http://localhost:8000/api/posts')
-        const data = await res.json()
-        const timeSortedPosts = data.posts.sort((a, b) => (b.timestamp > a.timestamp) ? 1 : -1)
-        setPosts(timeSortedPosts)
-        setLoading(false)
-      } catch (err) {
-        console.error('error fetching data', err)
-        setError(err)
-      }
-    }
-    getAllPosts()
-  }, [])
+  // const getAllPosts = async () => {
+  //   const res = await fetch('http://localhost:8000/api/posts')
+  //   const data = await res.json()
+  //   const timeSortedPosts = data.posts.sort((a, b) => (b.timestamp > a.timestamp) ? 1 : -1)
+  //   return timeSortedPosts
+  // }
+  const { data: posts, isLoading, isError } = usePostData()
 
   console.log(posts)
 
-  if (error) return 'Error...'
-  if (loading) return 'Loading...'
+  if (isError) return 'Error...'
+  if (isLoading) return 'Loading...'
 
   return (
+    <>
     <div className='App'>
       <BrowserRouter>
-        <UserContext.Provider value={value}>  
-          <Navbar />
-          <Routes>
-            <Route path='/' element={
-              <Home 
-                posts={posts}
-              />  
-            }>  
-            </Route>
-            <Route path='/admin' element={
-                <Admin 
+          <UserContext.Provider value={value}>  
+            <Navbar />
+            <Routes>
+              <Route path='/' element={
+                <Home 
                   posts={posts}
-                  setPosts={setPosts}
                 />  
-            }>
-            </Route>
-            <Route path='/login' element={
-              <Login />  
-            }>
-            </Route>
-            <Route path='/logout' element={
-              <Logout />
-            }>
-            </Route>
-            <Route path='/create' element={
-              <Create 
-                posts={posts}
-                setPosts={setPosts}
+              }>  
+              </Route>
+              <Route path='/admin' element={
+                  <Admin 
+                    posts={posts}
+                    // setPosts={setPosts}
+                  />  
+              }>
+              </Route>
+              <Route path='/login' element={
+                <Login />  
+              }>
+              </Route>
+              <Route path='/logout' element={
+                <Logout />
+              }>
+              </Route>
+              <Route path='/create' element={
+                <Create 
+                  posts={posts}
+                  //setPosts={setPosts}
+                />
+              }>
+              </Route>
+              <Route path='/signup' element={
+                <Signup />  
+              }>
+              </Route>
+              <Route path='/dashboard' element={
+                <Dashboard 
+                  posts={posts} 
+                  //setPosts={setPosts}
+                />
+              }>  
+              </Route>
+              <Route 
+                path='/posts/:id' 
+                element={<SinglePost
+                  posts={posts} 
+                  //setPosts={setPosts}
+                />}  
+              />  
+              <Route 
+                path='/posts/:id/edit' 
+                element={<EditPost/>}
               />
-            }>
-            </Route>
-            <Route path='/signup' element={
-              <Signup />  
-            }>
-            </Route>
-            <Route path='/dashboard' element={
-              <Dashboard 
-                posts={posts} 
-                setPosts={setPosts}
-              />
-            }>  
-            </Route>
-            <Route 
-              path='/posts/:id' 
-              element={<SinglePost
-                posts={posts} 
-                setPosts={setPosts}
-              />}  
-            />  
-            <Route 
-              path='/posts/:id/edit' 
-              element={<EditPost/>}
-            />
-          </Routes>
-        </UserContext.Provider>
+            </Routes>
+          </UserContext.Provider>
       </BrowserRouter>  
 
     </div>
+    {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+    </>
   );
 }
 

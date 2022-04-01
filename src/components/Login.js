@@ -1,16 +1,38 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router'
 import { UserContext } from '../UserContext'
+import { useFetchCurrentUser, useLogin } from '../hooks/usePostData'
 
 function Login() {
     const {currentUser, setCurrentUser} = useContext(UserContext)
-
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
     let navigate = useNavigate()
     
-    // define inside the useEffect?
+    // const { data: user } = useFetchCurrentUser(token)
+    // console.log(user)
+    
+    useEffect(()=> {
+        const token = localStorage.getItem('token')
+        initUser(token)
+    }, [])
+    
+    const initUser = async (token) => {
+        console.log(token)
+        if (token) {
+            const user = getUser(token)
+            setCurrentUser(user)
+            console.log(user)
+            navigate('/dashboard')
+        }
+        else {
+            setCurrentUser(null)
+        }
+    }
+    
+    // issues using useFetchCurrentUser
+    // cannot conditionally invoke a react hook, so kept this as-is
     const getUser = async (token) => {
         const res = await fetch('http://localhost:8000/api/users', {
             headers: { 
@@ -21,24 +43,9 @@ function Login() {
         return data.user
     }
     
-    // check for token to see if already logged in, redirect to /dashboard if so
-    useEffect(()=> {
-        const token = localStorage.getItem('token')
-        const initUser = async () => {
-            if (token) {
-                const user = await getUser(token)
-                setCurrentUser(user)
-                navigate('/dashboard')
-            }
-            else {
-                console.log('else')
-                setCurrentUser(null)
-            }
-        }
-        initUser()
-    }, [])
+    console.log(username, password)
     
-    // post login credentials to server, get user back, set user to response, save token to LS, redirect to /dashboard
+    // const { mutate: login } = useLogin()
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
@@ -53,8 +60,8 @@ function Login() {
                 })
             })
             const data = await res.json()
-            setCurrentUser(data.user)
-            localStorage.setItem('token', data.token)
+            setCurrentUser(await data.user)
+            localStorage.setItem('token', await data.token)
             navigate('/dashboard')
             console.log(currentUser)
         }
@@ -63,7 +70,15 @@ function Login() {
             // use the err to set state for error
             // display something based on the error
         }
+        // login({username, password})
+        // console.log(user)
         
+        // setCurrentUser(user.user)
+        // localStorage.setItem('token', user.token)
+        // console.log(currentUser)
+        // navigate('/dashboard')
+        
+       
         // clear form/state values
         setUsername('')
         setPassword('')
