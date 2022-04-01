@@ -15,7 +15,7 @@ import {
     } from '../hooks/usePostData'
 
 
-function SinglePost({ posts }) {
+function SinglePost() {
     const { currentUser } = useContext(UserContext)
     const { id } = useParams()
     const [showCommentForm, setShowCommentForm] = useState(false)
@@ -39,8 +39,7 @@ function SinglePost({ posts }) {
 
     const { mutate: publishToggle } = usePublishToggle(id)
     const handlePubToggle = async (e) => {
-        const post = posts.find(post => post._id === e.target.id)
-        publishToggle({e, token, post})
+        publishToggle({ token, post: singlePost })
     }
 
     const handleEditPost = () => {
@@ -69,9 +68,6 @@ function SinglePost({ posts }) {
 
 
     if(singlePostIsLoading) return (<p>loading...</p>) 
-
-    debugger;
-
     
         return (
             <div>    

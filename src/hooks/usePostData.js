@@ -57,11 +57,10 @@ const fetchSinglePost = async (token, id) => {
     })
     const json = await res.json()
     debugger;
-    return await json.post
+    return json.post
     // return { post:json.updatedPost}
 }
 export const useSinglePost = (token, id) => {
-
     return useQuery(["post", id], () => fetchSinglePost(token, id))
 }
 
@@ -169,8 +168,8 @@ export const useSaveEdit = () => {
     })
 }
 
-const publishToggle = async ({e, token, post}) => {    
-    const res = await fetch(`http://localhost:8000/api/posts/${e.target.id}`, {
+const publishToggle = async ({ token, post}) => {    
+    const res = await fetch(`http://localhost:8000/api/posts/${post._id}`, {
         method: "PATCH",
         headers: { 
             "Content-type": "application/json",
@@ -193,6 +192,7 @@ export const usePublishToggle = (id) => {
         // need to click out of window for render items to update
         onSuccess: (response) => {
             queryClient.setQueryData(["post", id], response)
+            queryClient.invalidateQueries('posts')
         }
     })
 }
