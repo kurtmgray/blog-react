@@ -37,7 +37,7 @@ function SinglePost({ posts }) {
         navigate('/dashboard')  
     }
 
-    const { mutate: publishToggle } = usePublishToggle()
+    const { mutate: publishToggle } = usePublishToggle(id)
     const handlePubToggle = async (e) => {
         const post = posts.find(post => post._id === e.target.id)
         publishToggle({e, token, post})
@@ -67,17 +67,21 @@ function SinglePost({ posts }) {
         saveEdit({e, token, id, editedComment})
     }
 
-    if(singlePostIsLoading) return (<p>loading...</p>)
-    else {
+
+    if(singlePostIsLoading) return (<p>loading...</p>) 
+
+    debugger;
+
+    
         return (
             <div>    
                 <div className="single-post-container">
-                    <img className="post-img" src={singlePost.post.imgUrl} alt='pic'/>
-                    <h3>{singlePost.post.title}</h3>
+                    <img className="post-img" src={singlePost.imgUrl} alt='pic'/>
+                    <h3>{singlePost.title}</h3>
                     <div>
-                        {parse(singlePost.post.text)}
+                        {parse(singlePost.text)}
                     </div>
-                    {singlePost.post.author ? <p>{singlePost.post.author.fname}</p> : null }
+                    {singlePost.author ? <p>{singlePost.author.fname}</p> : null }
                     {postComments && postComments.length > 0 ? (
                         <div className="comment-container">
                             <h3>Comments ({postComments.length})</h3>
@@ -110,12 +114,12 @@ function SinglePost({ posts }) {
                     )}
                     {currentUser && currentUser.admin &&
                         <div className="single-post-buttons">
-                            <button id={singlePost.post._id} onClick={handleDeletePost}>Delete Post</button>
-                            <button id={singlePost.post._id} onClick={handleEditPost}>Edit Post</button>
-                            {singlePost.post.published ? (
-                                    <button id={singlePost.post._id} onClick={handlePubToggle}>Unpublish Post</button>
+                            <button id={singlePost._id} onClick={handleDeletePost}>Delete Post</button>
+                            <button id={singlePost._id} onClick={handleEditPost}>Edit Post</button>
+                            {singlePost.published ? (
+                                    <button id={singlePost._id} onClick={handlePubToggle}>Unpublish Post</button>
                             ) : (
-                                    <button id={singlePost.post._id} onClick={handlePubToggle}>Publish Post</button>
+                                    <button id={singlePost._id} onClick={handlePubToggle}>Publish Post</button>
                             )}
                         </div>    
                     }
@@ -124,6 +128,6 @@ function SinglePost({ posts }) {
             </div>
         )
     } 
-}
+
 
 export default SinglePost

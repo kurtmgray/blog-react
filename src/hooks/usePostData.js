@@ -55,10 +55,14 @@ const fetchSinglePost = async (token, id) => {
             Authorization: 'Bearer ' + token 
         }
     })
-    return res.json()
+    const json = await res.json()
+    debugger;
+    return await json.post
+    // return { post:json.updatedPost}
 }
 export const useSinglePost = (token, id) => {
-    return useQuery(["single-post", token, id], () => fetchSinglePost(token, id))
+
+    return useQuery(["post", id], () => fetchSinglePost(token, id))
 }
 
 const deleteSinglePost = async ({e, token}) => {
@@ -176,17 +180,19 @@ const publishToggle = async ({e, token, post}) => {
             published: !post.published
         }),
     })
-    return await res.json()
+    const json = await res.json()
+
+    return json.updatedPost
 }
-export const usePublishToggle = () => {
+export const usePublishToggle = (id) => {
     const queryClient = useQueryClient()
+    
     return useMutation(publishToggle, {
+        // mutationKey: ["posts", id]
         // not working as expected...
         // need to click out of window for render items to update
         onSuccess: (response) => {
-            queryClient.setQueryData("single-post", () => {
-                return response.updatedPost
-            })
+            queryClient.setQueryData(["post", id], response)
         }
     })
 }
