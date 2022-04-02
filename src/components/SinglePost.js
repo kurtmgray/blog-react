@@ -11,36 +11,32 @@ import {
     useDeleteComment,
     useSaveEdit,
     usePublishToggle,
-    useDeleteSinglePost 
-    } from '../hooks/usePostData'
+    useDeleteSinglePost,
+    useCurrentUser 
+} from '../hooks/usePostData'
 
 
-function SinglePost({ posts }) {
-    const { currentUser } = useContext(UserContext)
+function SinglePost() {
+    //const { currentUser } = useContext(UserContext)
+    const { data: currentUser } = useCurrentUser()
     const { id } = useParams()
     const [showCommentForm, setShowCommentForm] = useState(false)
     const [newComment, setNewComment] = useState('')
     const [editedComment, setEditedComment] = useState('')
-    const [token, setToken] = useState('')
     let navigate = useNavigate()
 
-    useEffect(() => {
-        setToken(localStorage.getItem('token'))
-    }, [])
-        
-    const { data: singlePost, isLoading: singlePostIsLoading } = useSinglePost(token, id)
-    const { data: postComments } = usePostComments(token, id)
+    const { data: singlePost, isLoading: singlePostIsLoading } = useSinglePost(id)
+    const { data: postComments } = usePostComments(id)
 
     const { mutate: deletePost } = useDeleteSinglePost()
-    const handleDeletePost = (e) => {
-        deletePost({e, token})
+    const handleDeletePost = () => {
+        deletePost(singlePost._id)
         navigate('/dashboard')  
     }
 
-    const { mutate: publishToggle } = usePublishToggle()
-    const handlePubToggle = async (e) => {
-        const post = posts.find(post => post._id === e.target.id)
-        publishToggle({e, token, post})
+    const { mutate: publishToggle } = usePublishToggle(id)
+    const handlePubToggle = async () => {
+        publishToggle({ post: singlePost })
     }
 
     const handleEditPost = () => {
@@ -50,7 +46,7 @@ function SinglePost({ posts }) {
     const { mutate: addComment } = useAddComment()
     const handleSubmitComment = async (e) => {
         e.preventDefault()
-        addComment({token, id, currentUser, newComment})
+        addComment({id, currentUser, newComment})
         setNewComment('')
         setShowCommentForm(false)
     }
@@ -58,72 +54,68 @@ function SinglePost({ posts }) {
     const { mutate: deleteComment } = useDeleteComment()
     const handleDeleteComment = async (e) => {
         e.preventDefault()
-        deleteComment({e, token, id})
+        deleteComment({e, id})
     }
 
     const { mutate: saveEdit } = useSaveEdit()
     const handleSaveEdit = async (e) => {
         e.preventDefault()
-        saveEdit({e, token, id, editedComment})
+        saveEdit({e, id, editedComment})
     }
 
     if(singlePostIsLoading) return (<p>loading...</p>)
-    else {
-        return (
-            <div>    
-                <div className="single-post-container">
-                    <img className="post-img" src={singlePost.post.imgUrl} alt='pic'/>
-                    <h3>{singlePost.post.title}</h3>
-                    <div>
-                        {parse(singlePost.post.text)}
-                    </div>
-                    {singlePost.post.author ? <p>{singlePost.post.author.fname}</p> : null }
-                    {postComments && postComments.length > 0 ? (
-                        <div className="comment-container">
-                            <h3>Comments ({postComments.length})</h3>
-                            {postComments.map(comment => (
-                                <Comment 
-                                    key={comment._id}
-                                    comment={comment}
-                                    handleDelete={handleDeleteComment}
-                                    onSaveEdit={handleSaveEdit}
-                                    editedComment={editedComment}
-                                    setEditedComment={setEditedComment}
-
-                                />
-                            ))}
-                        </div>) 
-                    : null }
-                    {!showCommentForm ? (
-                        currentUser ? (
-                            <button onClick={() => setShowCommentForm(true)} >Add Comment</button>
-                        ) : (
-                            <button disabled="true">Log in to comment</button>
-                        )    
-                        ) : ( <CommentForm 
-                            value={newComment}
-                            onChange={setNewComment}
-                            onSubmit={handleSubmitComment}
-                            showCommentForm={showCommentForm}
-                        
-                        />
-                    )}
-                    {currentUser && currentUser.admin &&
-                        <div className="single-post-buttons">
-                            <button id={singlePost.post._id} onClick={handleDeletePost}>Delete Post</button>
-                            <button id={singlePost.post._id} onClick={handleEditPost}>Edit Post</button>
-                            {singlePost.post.published ? (
-                                    <button id={singlePost.post._id} onClick={handlePubToggle}>Unpublish Post</button>
-                            ) : (
-                                    <button id={singlePost.post._id} onClick={handlePubToggle}>Publish Post</button>
-                            )}
-                        </div>    
-                    }
+    
+    return (
+        <div>    
+            <div className="single-post-container">
+                <img className="post-img" src={singlePost.imgUrl ? singlePost.imgUrl: 'https://picsum.photos/200/300'} alt='pic'/>
+                <h3>{singlePost.title}</h3>
+                <div>
+                    {parse(singlePost.text)}
                 </div>
-                
+                {singlePost.author ? <p>{singlePost.author.fname}</p> : null }
+                {postComments && postComments.length > 0 ? (
+                    <div className="comment-container">
+                        <h3>Comments ({postComments.length})</h3>
+                        {postComments.map(comment => (
+                            <Comment 
+                                key={comment._id}
+                                comment={comment}
+                                handleDelete={handleDeleteComment}
+                                onSaveEdit={handleSaveEdit}
+                                editedComment={editedComment}
+                                setEditedComment={setEditedComment}
+
+                            />
+                        ))}
+                    </div>) 
+                : null }
+                {!showCommentForm ? (
+                    currentUser ? (
+                        <button onClick={() => setShowCommentForm(true)} >Add Comment</button>
+                    ) : (
+                        <button disabled="true">Log in to comment</button>
+                    )    
+                    ) : ( <CommentForm 
+                        value={newComment}
+                        onChange={setNewComment}
+                        onSubmit={handleSubmitComment}
+                        showCommentForm={showCommentForm}
+                    
+                    />
+                )}
+                {currentUser && currentUser.admin &&
+                    <div className="single-post-buttons">
+                        <button id={singlePost._id} onClick={handleDeletePost}>Delete Post</button>
+                        <button id={singlePost._id} onClick={handleEditPost}>Edit Post</button>
+                        <button id={singlePost._id} onClick={handlePubToggle}>
+                            {singlePost.published ? 'Unpublish Post' : 'Publish Post' }
+                        </button>
+                    </div>    
+                }
             </div>
-        )
-    } 
+        </div>
+    ) 
 }
 
 export default SinglePost

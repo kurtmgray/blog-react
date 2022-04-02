@@ -2,51 +2,43 @@ import React, { useState, useContext, useEffect } from 'react'
 import { UserContext } from '../UserContext'
 import { useNavigate } from 'react-router'
 import { Editor } from '@tinymce/tinymce-react'
+import { useCreatePost, useCurrentUser } from '../hooks/usePostData'
 
 function Create() {
-    const [title, setTitle] = useState('')    
-    const [text, setText] = useState('')
-    const [imgUrl, setImgUrl] = useState('')    
-    const [published, setPublished] = useState(false)
+    //const { currentUser } = useContext(UserContext)
+    const { data: currentUser } = useCurrentUser()
+
     const [disable, setDisable] = useState(true)
-    const { currentUser } = useContext(UserContext)
+    const [newPost, setNewPost] = useState({
+        title: '',
+        text: '',
+        imgUrl: '',
+        published: false
+    })
+    
     let navigate = useNavigate()
     
     useEffect(() => {
-        title && text ? setDisable(false) : setDisable(true)
-    }, [title, text])
+        if (!currentUser) {
+            navigate('/login')
+        }
+        newPost.title && newPost.text ? setDisable(false) : setDisable(true)
+    }, [currentUser, navigate, newPost.title, newPost.text])
     
+    const { mutate: createPost } = useCreatePost()
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const token = localStorage.getItem('token')
-        try {
-            const res = await fetch("http://localhost:8000/api/posts/", {
-                method: "POST",
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    Authorization: 'Bearer ' + token  
-                },
-                body: JSON.stringify({
-                    author: currentUser ? currentUser.id : null,
-                    title: title,
-                    imgUrl: imgUrl,
-                    text: text,
-                    published: published,
-
-                })
-            })
-            const data = await res.json()
-            console.log('Success', data)
-            navigate('/dashboard')
-
-        } catch(err) {
-            console.error(err)
-        }
-        setTitle('')
-        setText('')
+        createPost({ currentUser, newPost })
+        setNewPost({
+            title: '',
+            text: '',
+            imgUrl: '',
+            published: false
+        })
+        navigate('/dashboard')
     }
 
-    console.log(title, text)
+    console.log(newPost)
 
     return (
         <div className="create-container">
@@ -58,8 +50,8 @@ function Create() {
                         className="title-input"
                         type="text" 
                         name="title"  
-                        value={title} 
-                        onChange={e => setTitle(e.target.value)}
+                        value={newPost.title} 
+                        onChange={e => setNewPost(v => ({...v, [e.target.name]: e.target.value}))}
                         required>
                     </input>
                     <label className="imgUrl" htmlFor="imgUrl"><h3>Image URL:</h3></label>
@@ -67,8 +59,8 @@ function Create() {
                         className="imgUrl-input"
                         type="text" 
                         name="imgUrl"  
-                        value={imgUrl} 
-                        onChange={e => setImgUrl(e.target.value)}>
+                        value={newPost.imgUrl} 
+                        onChange={e => setNewPost(v => ({...v, [e.target.name]: e.target.value}))}>
                     </input>        
                     <label className="text-input" htmlFor="text"><h3>Content:</h3></label>
                     <Editor
@@ -86,17 +78,10 @@ function Create() {
                                 // prettier-ignore
                                 "undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help",
                         }}
-                        value={text}
-                        textareaName="content"
-                        onEditorChange={(content) => setText(content)}
+                        value={newPost.text}
+                        textareaName="text"
+                        onEditorChange={text => setNewPost(v => ({ ...v, text: text }))}
                     ></Editor>
-                    {/* <textarea className="new-post"
-                        type="text" 
-                        name="text" 
-                        value={text}
-                        onChange={e => setText(e.target.value)}
-                        required>
-                    </textarea> */}
                     <div className="publish">
                         <label htmlFor="published"><h3>Publish?</h3></label>
                         <input 
@@ -104,7 +89,7 @@ function Create() {
                             name="published"
                             rows="5"
                             columns="32"
-                            onClick={e => setPublished(!published)}>    
+                            onClick={e => setNewPost(v => ({ ...v, [e.target.name]: e.target.checked }))}>    
                         </input>
                     </div>     
                     <button type="submit" disabled={disable}>Submit Post</button>

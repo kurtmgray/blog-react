@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react'
 import { UserContext } from '../UserContext'
 import EditCommentForm from './EditCommentForm'
 import { formatDistance, parseISO } from 'date-fns'
+import { useCurrentUser } from '../hooks/usePostData'
 
 
 function Comment({ 
@@ -12,9 +13,9 @@ function Comment({
     editedComment, 
     setEditedComment,
     }) {
-        const { currentUser } = useContext(UserContext)
+        //const { currentUser } = useContext(UserContext)
         const [editMode, setEditMode] = useState(false)
-        // state kept down here so toggle doesn't effect all comments
+        const { data: currentUser } = useCurrentUser()
 
         const toggleEditMode = () => {
             setEditMode(!editMode)

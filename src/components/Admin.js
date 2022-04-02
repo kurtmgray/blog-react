@@ -4,79 +4,36 @@ import { Link } from 'react-router-dom'
 import { UserContext } from '../UserContext';
 import { format, parseISO } from 'date-fns'
 import parse from 'html-react-parser'
-import { usePublishToggle, usePostData } from '../hooks/usePostData'
+import { 
+    usePostData,
+    usePublishToggle,
+    useDeleteSinglePost,
+    useCurrentUser
+} from '../hooks/usePostData'
 
-
-function Admin({ posts, setPosts }) {
-    const { currentUser } = useContext(UserContext)
-    const [token, setToken] = useState('')
+function Admin() {
+    //const { currentUser } = useContext(UserContext)
     let navigate = useNavigate()
-    
-    const { data: newPosts, isLoading, isError } = usePostData()
+    const { data: currentUser } = useCurrentUser()
 
     useEffect(() => {
-        setToken(localStorage.getItem('token'))
-        setPosts(newPosts)
         if (!currentUser || !currentUser.admin) {
-            console.log('use')
             navigate('/')   
         } 
     },[])
     
-
-
-    // const getAllPosts = async () => {
-    //     try {
-    //         const res = await fetch('http://localhost:8000/api/posts')
-    //         const data = await res.json()
-    //         //setPosts(data.posts)
-    //     } catch (err) {
-    //         console.error('error fetching data', err)
-    //     }
-    // }
-   
-    const handleDelete = async (e) => {
-        const token = localStorage.getItem('token')
-
-        const res = await fetch(`http://localhost:8000/api/posts/${e.target.id}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: 'Bearer ' + token
-            },
-        })
-        const data = await res.json()
-        console.log(data)
-        // getAllPosts()  
+    const { data: posts } = usePostData()
+    
+    const { mutate: deletePost } = useDeleteSinglePost()
+    const handleDelete = (e) => {
+        deletePost(e.target.id)
     }
     
     const { mutate: publishToggle } = usePublishToggle()
     const handlePubToggle = async (e) => {
         const post = posts.find(post => post._id === e.target.id)
-        publishToggle({e, token, post})
+        publishToggle({ post })
     }
-
-    // const handlePubToggle = async (e) => {
-    //     const token = localStorage.getItem('token')
-    //     const selectedPost = posts.find(post => post._id === e.target.id)
-        
-    //     const res = await fetch(`http://localhost:8000/api/posts/${e.target.id}`, {
-    //         method: "PATCH",
-    //         headers: { 
-    //             "Content-type": "application/json",
-    //             Authorization: 'Bearer ' + token
-    //         },
-    //         body: JSON.stringify({
-    //             published: !selectedPost.published
-    //         }),
-    //     })
-    //     const data = await res.json()
-        
-    //     const postsCopy = [...posts]
-    //     const newPostIndex = posts.findIndex(post => post._id === data.updatedPost._id)
-    //     postsCopy.splice(newPostIndex, 1, data.updatedPost)
-    //     // setPosts(postsCopy)
-
-    // }
 
     const handleEdit = (e) => {
         const post = posts.find(post => post._id === e.target.id)
@@ -91,7 +48,6 @@ function Admin({ posts, setPosts }) {
         return text.slice(0, 200) + '...'
     }
     
-
     return ( 
         <div>
             <h2>Admin Page</h2>
@@ -100,7 +56,7 @@ function Admin({ posts, setPosts }) {
                     posts.map(post =>  (
                         <div className={`admin-post ${post.published ? 'published' : 'unpublished'}`} key={post._id}>
                             <Link to={`/posts/${post._id}`} className="post-img post-element" style={{textDecoration: 'none'}}>
-                                <img className="post-img post-element" src={post.imgUrl} alt="pic"></img>
+                                <img className="post-img post-element" src={post.imgUrl ? post.imgUrl : 'https://picsum.photos/200/300'} alt="pic"></img>
                             </Link>
                             <div className="post-details post-element">
                                 <h4 className="post-title">{post.title}</h4>
@@ -111,11 +67,9 @@ function Admin({ posts, setPosts }) {
                             <div className="admin-button-container post-element">    
                                 <button className="admin-button" id={post._id} onClick={handleDelete}>Delete</button>
                                 <button className="admin-button" id={post._id} onClick={handleEdit}>Edit</button>
-                                {post.published ? (
-                                        <button className="admin-button" id={post._id} onClick={handlePubToggle}>Unpublish</button>
-                                ) : (
-                                        <button className="admin-button" id={post._id} onClick={handlePubToggle}>Publish</button>
-                                )}
+                                <button className="admin-button" id={post._id} onClick={handlePubToggle}>
+                                    {post.published ? 'Unpublish' : 'Publish'} 
+                                </button>
                             </div>
                         </div>     
                     ))

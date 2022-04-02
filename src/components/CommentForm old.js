@@ -1,9 +1,12 @@
 import React, { useState, useContext } from 'react'
 import { UserContext } from '../UserContext'
 import { useNavigate } from 'react-router-dom'
+import { useCurrentUser } from '../hooks/usePostData'
 
 function CommentForm({ id, setShowCommentForm, setReload }) {
-    const { currentUser } = useContext(UserContext)
+    //const { currentUser } = useContext(UserContext)
+    
+    const { data: currentUser } = useCurrentUser()
     const [newComment, setNewComment] = useState('')
 
     let navigate = useNavigate()

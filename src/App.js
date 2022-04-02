@@ -49,8 +49,6 @@ function App() {
   // }
   const { data: posts, isLoading, isError } = usePostData()
 
-  console.log(posts)
-
   if (isError) return 'Error...'
   if (isLoading) return 'Loading...'
 
@@ -116,7 +114,7 @@ function App() {
       </BrowserRouter>  
 
     </div>
-    {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+    {/* <ReactQueryDevtools initialIsOpen={true} /> */}
     </>
   );
 }

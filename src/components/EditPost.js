@@ -3,88 +3,50 @@ import { UserContext } from '../UserContext';
 import { useNavigate } from 'react-router'
 import { useParams } from 'react-router-dom'
 import { Editor } from '@tinymce/tinymce-react'
+import { useSinglePost, useEditPost, useCurrentUser } from '../hooks/usePostData'
 
 
 function EditPost() {
-    const { currentUser } = useContext(UserContext)
-    const [post, setPost] = useState(null)
-    const [title, setTitle] = useState('')    
-    const [text, setText] = useState('')
-    const [published, setPublished] = useState(false)    
+    //const { currentUser } = useContext(UserContext)
+    const { data: currentUser } = useCurrentUser()
+
     const { id } = useParams()
+    const [values, setValues] = useState({
+        title: '',
+        text: '',
+        published: false
+    })    
 
     let navigate = useNavigate()
 
-    const getPost = async (id) => {
-        const token = localStorage.getItem('token')
-        const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
-            headers: {
-                Authorization: 'Bearer ' + token 
-            }
-        })
-        const data = await res.json()
-        console.log(data)
-        return data.post
-    }
+    const { data: postData, isLoading } = useSinglePost(id)
 
     useEffect(() => {
-        const init = async () => {
-            try{
-                const postData = await getPost(id)
-                if (!currentUser || !postData || postData.author._id !== currentUser.id) {
-                    navigate(`/posts/${id}`)
-                    return
-                }
-                setPost(postData)
-                setTitle(postData.title)
-                setText(postData.text)
-                setPublished(postData.published)
-            } catch (err) {
-                console.error(err)
-            }    
+        if (!currentUser || !postData || postData.author._id !== currentUser.id) {
+            console.log('oops')
+            navigate(`/posts/${id}`)
         }
-        init()
-    }, [id])
+        if (postData) {
+            setValues({
+                title: postData.title,
+                text: postData.text,
+                published: postData.published
+            })
+        }
+    }, [currentUser, postData, id, navigate])
 
-    console.log(title, text, published)
-
+    const { mutate: editPost } = useEditPost(id)
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const token = localStorage.getItem('token')
-        
-        console.log('submitted')
-        try {
-            const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
-                method: "PUT",
-                headers: { 
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + token 
-                },
-                body: JSON.stringify({
-                    _id: post._id,
-                    author: post.author ? post.author : null,
-                    title: title,
-                    text: text,
-                    published: published,
-                    imgUrl: post.imgUrl,
-                    timestamp: post.timestamp
-                })
-            })
-            const data = await res.json()
-            console.log('Success', data)
-            navigate(`/posts/${id}`)
-
-        } catch (err) {
-            console.error(err)
-        }
+        editPost({ id, postData, values })
+        navigate(`/posts/${id}`)
     }
 
     const handleCancel = () => {
         navigate(`/posts/${id}`)
     }
 
-    if (!post) return null
-
+    if (isLoading) return <p>Loading...</p>
     return ( 
         <div>
             <h1>Edit Post</h1>
@@ -93,8 +55,8 @@ function EditPost() {
                 <input 
                     type="text" 
                     name="title"  
-                    value={title} 
-                    onChange={e => setTitle(e.target.value)}
+                    value={values.title} 
+                    onChange={e => setValues((v) => ({ ...v, [e.target.name]: e.target.value }))}
                     required>
                 </input>    
                 <label className="text-input" htmlFor="text"><h3>Content:</h3></label>
@@ -113,26 +75,18 @@ function EditPost() {
                                 // prettier-ignore
                                 "undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help",
                         }}
-                        value={text}
-                        textareaName="content"
-                        onEditorChange={(content) => setText(content)}
+                        value={values.text}
+                        textareaName="text"
+                        onEditorChange={text => setValues(v => ({ ...v, text: text }))}
                     ></Editor>
-                {/* <label htmlFor="text">Content:</label>
-                <textarea 
-                    type="text" 
-                    name="text" 
-                    value={text}
-                    onChange={e => setText(e.target.value)}
-                    required>
-                </textarea> */}
                 <label htmlFor="published">Publish?</label>
                 <input 
                     type="checkbox"
                     name="published"
-                    checked={published}
-                    onChange={e => setPublished(!published)}>    
+                    checked={values.published}
+                    onChange={e => setValues(v => ({ ...v, [e.target.name]: e.target.checked }))}>    
                 </input>
-                <div class="edit-buttons">
+                <div className="edit-buttons">
                     <button onClick={handleCancel}>Cancel</button>         
                     <button type="submit">Submit Edit</button>    
                 </div>
