@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
-import React, { useContext } from 'react';
-import { UserContext } from "../UserContext";
+import React from 'react';
 import { useCurrentUser } from "../hooks/usePostData";
 import navLogo from './assets/svg/nav-logo.svg'
 
 
 function Navbar() {
-    // const { currentUser } = useContext(UserContext)
     const { data: currentUser } = useCurrentUser()
 
     return (

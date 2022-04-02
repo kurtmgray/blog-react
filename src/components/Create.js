@@ -1,13 +1,10 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { UserContext } from '../UserContext'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import { Editor } from '@tinymce/tinymce-react'
 import { useCreatePost, useCurrentUser } from '../hooks/usePostData'
 
 function Create() {
-    //const { currentUser } = useContext(UserContext)
     const { data: currentUser } = useCurrentUser()
-
     const [disable, setDisable] = useState(true)
     const [newPost, setNewPost] = useState({
         title: '',
@@ -37,8 +34,6 @@ function Create() {
         })
         navigate('/dashboard')
     }
-
-    console.log(newPost)
 
     return (
         <div className="create-container">

@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
-import { UserContext } from '../UserContext'
 import { useCurrentUser, useLogin } from '../hooks/usePostData'
 
 function Login() {
-    // const { currentUser, setCurrentUser } = useContext(UserContext)
     const [values, setValues] = useState({ username: '', password: '' })
 
     let navigate = useNavigate()

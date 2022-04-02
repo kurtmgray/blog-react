@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { UserContext } from '../UserContext'
 import Comment from './Comment'
 import CommentForm from './CommentForm'
 import parse from 'html-react-parser'
@@ -17,7 +16,6 @@ import {
 
 
 function SinglePost() {
-    //const { currentUser } = useContext(UserContext)
     const { data: currentUser } = useCurrentUser()
     const { id } = useParams()
     const [showCommentForm, setShowCommentForm] = useState(false)

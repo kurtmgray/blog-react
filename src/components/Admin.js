@@ -1,7 +1,6 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
-import { UserContext } from '../UserContext';
 import { format, parseISO } from 'date-fns'
 import parse from 'html-react-parser'
 import { 
@@ -12,7 +11,6 @@ import {
 } from '../hooks/usePostData'
 
 function Admin() {
-    //const { currentUser } = useContext(UserContext)
     let navigate = useNavigate()
     const { data: currentUser } = useCurrentUser()
 

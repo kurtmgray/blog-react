@@ -1,5 +1,4 @@
-import React, { useState, useContext } from 'react'
-import { UserContext } from '../UserContext'
+import React, { useState } from 'react'
 import EditCommentForm from './EditCommentForm'
 import { formatDistance, parseISO } from 'date-fns'
 import { useCurrentUser } from '../hooks/usePostData'
@@ -13,7 +12,6 @@ function Comment({
     editedComment, 
     setEditedComment,
     }) {
-        //const { currentUser } = useContext(UserContext)
         const [editMode, setEditMode] = useState(false)
         const { data: currentUser } = useCurrentUser()
 

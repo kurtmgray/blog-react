@@ -1,13 +1,11 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
-import { UserContext } from '../UserContext';
 import parse from 'html-react-parser'
 import { usePostData, useCurrentUser } from '../hooks/usePostData'
 
 
 function Dashboard() {
-    //const { currentUser } = useContext(UserContext)
     const { data: currentUser } = useCurrentUser()
 
     let navigate = useNavigate()

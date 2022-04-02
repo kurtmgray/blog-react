@@ -1,9 +1,17 @@
 import { Link } from 'react-router-dom'
+import { usePostData } from '../hooks/usePostData'
 import homeLogo from './assets/svg/home.svg'
 
-function Home({ posts }) {
+
+function Home() {
+    const { data: posts, isLoading, isError } = usePostData()
+    console.log(posts)
     const publishedPosts = posts.filter(post => post.published)
     console.log(publishedPosts)
+    
+    if (isError) return 'Error...'
+    if (isLoading) return 'Loading...'
+    
     return (
         <div className="home">
                 <div className="hero">

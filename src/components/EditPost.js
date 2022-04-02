@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { UserContext } from '../UserContext';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router'
 import { useParams } from 'react-router-dom'
 import { Editor } from '@tinymce/tinymce-react'
@@ -7,7 +6,6 @@ import { useSinglePost, useEditPost, useCurrentUser } from '../hooks/usePostData
 
 
 function EditPost() {
-    //const { currentUser } = useContext(UserContext)
     const { data: currentUser } = useCurrentUser()
 
     const { id } = useParams()
