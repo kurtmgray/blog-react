@@ -102,7 +102,7 @@ function SinglePost() {
                     
                     />
                 )}
-                {currentUser && currentUser.admin &&
+                {currentUser && (currentUser.admin || currentUser.id === singlePost.author._id) &&
                     <div className="single-post-buttons">
                         <button id={singlePost._id} onClick={handleDeletePost}>Delete Post</button>
                         <button id={singlePost._id} onClick={handleEditPost}>Edit Post</button>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 import parse from 'html-react-parser'
@@ -7,22 +7,31 @@ import { usePostData, useCurrentUser } from '../hooks/usePostData'
 
 function Dashboard() {
     const { data: currentUser } = useCurrentUser()
-
     let navigate = useNavigate()
     
-    const { data: posts } = usePostData()
-    console.log(posts)
-
     useEffect(() => {
         if (!currentUser) {
             navigate('/login')
         }
     }, [currentUser, navigate])
     
+    const { data: posts, isLoading: postsIsLoading } = usePostData()
+    console.log(posts)
+    console.log(currentUser)
+    
+    const userPosts = posts.filter(post => post.author._id === currentUser.id)
+    
+    console.log(userPosts)
+    
     const preview = (text) => {
         return text.slice(0, 200)+'...'
     }
-    
+    if (postsIsLoading) {
+        console.log('loading')
+        return 'Updating posts'
+    }
+    if (!userPosts) return 'Updating user posts...'
+
     return (
         <div>
             {currentUser ? (
@@ -31,8 +40,8 @@ function Dashboard() {
                     <div className="dashboard-posts-container">
                         <h3>Published Posts</h3>
                         <hr/> 
-                            {posts && posts.some(post => post.published) ?
-                                posts.map(post => {
+                            {userPosts && userPosts.some(post => post.published) ?
+                                userPosts.map(post => {
                                     if (post.published) {    
                                         return <Link to={`/posts/${post._id}`} key={post._id} style={{textDecoration: 'none'}}>
                                             <div className="dashboard-post post-element" >
@@ -52,8 +61,8 @@ function Dashboard() {
                             } 
                         <h3>Unpublished Posts</h3>
                         <hr/> 
-                            {posts && posts.some(post => !post.published) ?
-                                posts.map(post => {
+                            {userPosts && userPosts.some(post => !post.published) ?
+                                userPosts.map(post => {
                                     if (!post.published) {
                                         return <Link to={`/posts/${post._id}`} key={post._id} style={{textDecoration: 'none'}}> 
                                             <div className="dashboard-post post-element" >

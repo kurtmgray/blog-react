@@ -18,7 +18,7 @@ function Admin() {
         if (!currentUser || !currentUser.admin) {
             navigate('/')   
         } 
-    },[])
+    },[currentUser, navigate])
     
     const { data: posts } = usePostData()
     

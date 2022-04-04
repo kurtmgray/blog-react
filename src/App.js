@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState, useEffect, useMemo } from 'react'
+// import React, { useState, useEffect, useMemo } from 'react'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Admin from './components/Admin';
@@ -11,11 +11,10 @@ import Dashboard from './components/Dashboard'
 import SinglePost from './components/SinglePost'
 import EditPost from './components/EditPost';
 import Logout from './components/Logout'
-import { usePostData, useCurrentUser } from './hooks/usePostData';
+import { usePostData } from './hooks/usePostData';
 import { ReactQueryDevtools } from 'react-query/devtools'
 
 function App() {
-  const { data: currentUser } = useCurrentUser()
   const { data: posts, isLoading, isError } = usePostData()
 
   if (isError) return 'Error...'
@@ -28,7 +27,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path='/' element={
-            <Home />  
+            <Home posts={posts}/>  
           }>  
           </Route>
           <Route path='/admin' element={

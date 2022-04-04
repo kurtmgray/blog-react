@@ -1,3 +1,4 @@
+import { response } from "express";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 
 // Login.js
@@ -197,17 +198,29 @@ const publishToggle = async ({ post }) => {
 export const usePublishToggle = (id) => {
     const queryClient = useQueryClient()
     return useMutation(publishToggle, {
-        onSuccess: (response) => {
-            if (id) {
-                queryClient.setQueryData(["post", id], response)
-            }    
-            queryClient.setQueryData("posts", oldPosts => {
-                const newPosts = [...oldPosts]
-                const updatedPostIndex = newPosts.findIndex(post => post._id === response._id)
-                newPosts.splice(updatedPostIndex, 1, response)
-                return newPosts
-            })
+        onMutate: async updatedPost => {
+            await queryClient.cancelQueries(["post", id])
+            const previousPost = queryClient.getQueryData(["post", id])
+            queryClient.setQueryData(["post", id], updatedPost)
+            return { previousPost, updatedPost }
+        },
+        onError: (err, updatedPost, context) => {
+            queryClient.setQueryData(["post", id], context.previousPost)
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries(["post", id])
         }
+        // onSuccess: (response) => {
+        //     if (id) {
+        //         queryClient.setQueryData(["post", id], response)
+        //     }    
+        //     queryClient.setQueryData("posts", oldPosts => {
+        //         const newPosts = [...oldPosts]
+        //         const updatedPostIndex = newPosts.findIndex(post => post._id === response._id)
+        //         newPosts.splice(updatedPostIndex, 1, response)
+        //         return newPosts
+        //     })
+        // }
     })
 }
 
@@ -269,8 +282,32 @@ export const useCreatePost = () => {
     const queryClient = useQueryClient()
     return useMutation(createPost, {
         onSuccess: (response) => {
-            queryClient.setQueryData("posts", (oldPosts) => {
-                return [response,...oldPosts] 
+            queryClient.invalidateQueries("posts")
+        }
+    })
+}
+
+const createUser = async ({ userData }) => {
+    const res = await fetch("http://localhost:8000/api/users", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: userData.username,
+                    password: userData.password,
+                    fname: userData.fname,
+                    lname: userData.lname,
+                })
+            })
+            const data = await res.json()
+            console.log(data)
+}
+export const useCreateUser = () => {
+    const queryClient = useQueryClient()
+    return useMutation(createUser, {
+        onSuccess: (response) => {
+            queryClient.setQueryData("users", (oldUsers) => {
+                console.log(oldUsers)
+                return [response,...oldUsers] 
             })
         }
     })

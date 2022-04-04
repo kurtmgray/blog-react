@@ -1,53 +1,40 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
+import { useCreateUser } from '../hooks/usePostData'
 
 
 function Signup({ setCurrentUser }) {
-    const [username, setUsername] = useState('')
-    const [[password, confirm], setPassword] = useState(['',''])
-    const [fname, setFname] = useState('')
-    const [lname, setLname] = useState('')
     const [disable, setDisable] = useState(true)
-    
+    const [userData, setUserData] = useState({
+        username: '',
+        password: '',
+        confirm: '',
+        fname: '',
+        lname: '',
+    })
+
     let navigate = useNavigate()
 
+    const { mutate: createUser } = useCreateUser()
     const handleSubmit = async (e) => {
-        
         e.preventDefault()
-        
-        try {
-            const response = await fetch("http://localhost:8000/api/users", {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                    fname: fname,
-                    lname: lname,
-                })
-            })
-            
-            const data = await response.json()
-            console.log(data)
-        }
-        
-        catch (err) { 
-            console.log(err)
-        }    
-        
-        setUsername('')
-        setPassword(['',''])
-        setFname('')
-        setLname('')
+        createUser({ userData })
+        setUserData({
+            username: '',
+            password: '',
+            confirm: '',
+            fName: '',
+            lname: '',
+        })
         navigate('/login')
     }
 
     useEffect(() => {
-        username && password && fname && lname && confirm === password ? 
+        userData.username && userData.password && userData.fname && userData.lname && userData.confirm === userData.password ? 
             setDisable(false) : setDisable(true)
-    }, [username, password, confirm, fname, lname])
+    }, [userData.username, userData.password, userData.confirm, userData.fname, userData.lname])
  
-    console.log(username, password, fname, lname)
+    console.log(userData)
 
     return (
         <div className="signup-container">  
@@ -59,8 +46,8 @@ function Signup({ setCurrentUser }) {
                         type="text" 
                         name="username" 
                         placeholder="RobinSparkles1992" 
-                        value={username} 
-                        onChange={e => setUsername(e.target.value)}
+                        value={userData.username} 
+                        onChange={e => setUserData(v => ({...v, [e.target.name]: e.target.value}))}
                         required>
                     </input>    
                     <label htmlFor="fname">Enter your first name</label>
@@ -68,34 +55,34 @@ function Signup({ setCurrentUser }) {
                         type="text" 
                         name="fname" 
                         placeholder="Robin" 
-                        value={fname}
-                        onChange={e => setFname(e.target.value)}
+                        value={userData.fname}
+                        onChange={e => setUserData(v => ({...v, [e.target.name]: e.target.value}))}
                         required>
                     </input>
                     <label htmlFor="lname">Enter your last name</label>
                     <input type="text" 
                         name="lname" 
                         placeholder="Scherbatsky" 
-                        value={lname}
-                        onChange={e => setLname(e.target.value)}
+                        value={userData.lname}
+                        onChange={e => setUserData(v => ({...v, [e.target.name]: e.target.value}))}
                         required>
                     </input>
                     <label htmlFor="password">Enter a password</label>
                     <input 
                         type="password" 
                         name="password" 
-                        value={password}
-                        onChange={e => setPassword([e.target.value, confirm])}
+                        value={userData.password}
+                        onChange={e => setUserData(v => ({...v, [e.target.name]: e.target.value}))}
                         required></input>
                     <label htmlFor="confirm">Confirm your password</label>
                     <input 
                         type="password" 
                         name="confirm" 
-                        value={confirm}
-                        onChange={e => setPassword([password, e.target.value])}
+                        value={userData.confirm}
+                        onChange={e => setUserData(v => ({...v, [e.target.name]: e.target.value}))}
                         required>
                     </input>
-                    {confirm === password ? null : <p>Passwords do not match.</p>}
+                    {userData.confirm === userData.password ? null : <p>Passwords do not match.</p>}
                     <button type="submit" disabled={disable}>Create Account</button>    
                 </form>
             </div>
