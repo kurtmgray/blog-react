@@ -20,8 +20,7 @@ function EditPost() {
     const { data: postData, isLoading } = useSinglePost(id)
 
     useEffect(() => {
-        if (!currentUser || !postData || postData.author._id !== currentUser.id) {
-            console.log('oops')
+        if (!currentUser || !postData || (postData.author._id !== currentUser.id && !currentUser.admin)) {
             navigate(`/posts/${id}`)
         }
         if (postData) {
@@ -33,10 +32,10 @@ function EditPost() {
         }
     }, [currentUser, postData, id, navigate])
 
-    const { mutate: editPost } = useEditPost(id)
+    const { mutate: editPost } = useEditPost()
     const handleSubmit = async (e) => {
         e.preventDefault()
-        editPost({ id, postData, values })
+        editPost({ postData, values })
         navigate(`/posts/${id}`)
     }
 

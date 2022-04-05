@@ -11,10 +11,11 @@ import Dashboard from './components/Dashboard'
 import SinglePost from './components/SinglePost'
 import EditPost from './components/EditPost';
 import Logout from './components/Logout'
-import { usePostData } from './hooks/usePostData';
+import { useCurrentUser, usePostData } from './hooks/usePostData';
 import { ReactQueryDevtools } from 'react-query/devtools'
 
 function App() {
+  const { data: currentUser } = useCurrentUser()
   const { data: posts, isLoading, isError } = usePostData()
 
   if (isError) return 'Error...'

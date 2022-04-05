@@ -24,7 +24,8 @@ function Admin() {
     
     const { mutate: deletePost } = useDeleteSinglePost()
     const handleDelete = (e) => {
-        deletePost(e.target.id)
+        const id = e.target.id
+        deletePost({id})
     }
     
     const { mutate: publishToggle } = usePublishToggle()

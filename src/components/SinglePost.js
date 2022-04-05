@@ -8,7 +8,7 @@ import {
     usePostComments, 
     useAddComment,
     useDeleteComment,
-    useSaveEdit,
+    useSaveCommentEdit,
     usePublishToggle,
     useDeleteSinglePost,
     useCurrentUser 
@@ -20,7 +20,7 @@ function SinglePost() {
     const { id } = useParams()
     const [showCommentForm, setShowCommentForm] = useState(false)
     const [newComment, setNewComment] = useState('')
-    const [editedComment, setEditedComment] = useState('')
+    const [editedCommentText, setEditedCommentText] = useState('')
     let navigate = useNavigate()
 
     const { data: singlePost, isLoading: singlePostIsLoading } = useSinglePost(id)
@@ -28,11 +28,11 @@ function SinglePost() {
 
     const { mutate: deletePost } = useDeleteSinglePost()
     const handleDeletePost = () => {
-        deletePost(singlePost._id)
+        deletePost({id})
         navigate('/dashboard')  
     }
 
-    const { mutate: publishToggle } = usePublishToggle(id)
+    const { mutate: publishToggle } = usePublishToggle()
     const handlePubToggle = async () => {
         publishToggle({ post: singlePost })
     }
@@ -55,14 +55,14 @@ function SinglePost() {
         deleteComment({e, id})
     }
 
-    const { mutate: saveEdit } = useSaveEdit()
-    const handleSaveEdit = async (e) => {
+    const { mutate: saveCommentEdit } = useSaveCommentEdit()
+    const handleSaveCommentEdit = async (e) => {
         e.preventDefault()
-        saveEdit({e, id, editedComment})
+        saveCommentEdit({e, id, editedCommentText})
     }
 
     if(singlePostIsLoading) return (<p>loading...</p>)
-    
+
     return (
         <div>    
             <div className="single-post-container">
@@ -77,12 +77,12 @@ function SinglePost() {
                         <h3>Comments ({postComments.length})</h3>
                         {postComments.map(comment => (
                             <Comment 
-                                key={comment._id}
+                                key={comment._id ? comment._id : 'tempkey'}
                                 comment={comment}
                                 handleDelete={handleDeleteComment}
-                                onSaveEdit={handleSaveEdit}
-                                editedComment={editedComment}
-                                setEditedComment={setEditedComment}
+                                onSaveEdit={handleSaveCommentEdit}
+                                editedComment={editedCommentText}
+                                setEditedComment={setEditedCommentText}
 
                             />
                         ))}

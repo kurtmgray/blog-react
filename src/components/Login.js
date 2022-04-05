@@ -4,6 +4,7 @@ import { useCurrentUser, useLogin } from '../hooks/usePostData'
 
 function Login() {
     const [values, setValues] = useState({ username: '', password: '' })
+    const [err, setErr] = useState(null)
 
     let navigate = useNavigate()
     
@@ -15,14 +16,14 @@ function Login() {
         }
     }, [currentUser, navigate])
     
-    const { mutate: login } = useLogin()
+    const { mutate: login, data, isError } = useLogin()
     const handleSubmit = async (e) => {
         e.preventDefault()
         login({ values })
         setValues({ username: '', password: '' })
     }
 
-    console.log(values)
+    console.log(err)
 
     return (
         <div className="login-container">
@@ -46,6 +47,7 @@ function Login() {
                         onChange={e => setValues(v => ({...v, [e.target.name]: e.target.value}))}
                         required>
                     </input>
+                    {err ? <p>{err.message}</p> : null}
                     <button type="submit">Log In</button>
                 </form>
             </div>

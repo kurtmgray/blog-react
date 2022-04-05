@@ -1,4 +1,3 @@
-import { response } from "express";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 
 // Login.js
@@ -11,7 +10,6 @@ const fetchCurrentUser = async () => {
         },
     })
     const data = await res.json()
-    console.log(data)    
     return data.user
 }
 export const useCurrentUser = () => {
@@ -30,14 +28,21 @@ const login = async ({ values }) => {
         })
     })
     const data = await res.json()
+    // if (!data.success) {
+    //     return data.message
+    // }
     return data
 }
 export const useLogin = () => {
     const queryClient = useQueryClient()
     return useMutation(login, {
+        onError: (err) => {
+            console.log(err)
+        },
         onSuccess: (response) => {
+            console.log(response)
             queryClient.setQueryData("current-user", response.user)
-            localStorage.setItem('token', response.token)       
+            localStorage.setItem('token', response.token)      
         }
     })
 }
@@ -65,8 +70,8 @@ export const useSinglePost = (id) => {
     return useQuery(["post", id], () => fetchSinglePost(id))
 }
 
-const deleteSinglePost = async (singlePostId) => {
-    const res = await fetch(`http://localhost:8000/api/posts/${singlePostId}`, {
+const deleteSinglePost = async ({id}) => {
+    const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
         method: "DELETE",
         headers: {
             Authorization: 'Bearer ' + localStorage.getItem('token')
@@ -78,13 +83,25 @@ const deleteSinglePost = async (singlePostId) => {
 export const useDeleteSinglePost = () => {
     const queryClient = useQueryClient()
     return useMutation(deleteSinglePost, {
-        onSuccess: (deletedPost) => {
+        onMutate: async ({ id }) => {
+            await queryClient.cancelQueries("posts")
+            const previousPosts = queryClient.getQueryData("posts")
             queryClient.setQueryData("posts", oldPosts => {
                 const newPosts = [...oldPosts]
-                const index = newPosts.findIndex(post => post._id === deletedPost.id)
+                const index = newPosts.findIndex(post => post._id === id)
                 newPosts.splice(index, 1)
+                console.log(oldPosts)
+                console.log(newPosts)
                 return newPosts
             })
+            return { previousPosts }
+        },
+        onError: (err, _deletePostData, context) => {
+            console.log(err.message)
+            queryClient.setQueryData("posts", context.previousPosts)
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries("posts")
         }
     })
 }
@@ -100,7 +117,7 @@ const fetchPostComments = async (id) => {
     return timeSortedComments
 }
 export const usePostComments = (id) => {
-    return useQuery("post-comments", () => fetchPostComments(id))
+    return useQuery(["post-comments", id], () => fetchPostComments(id))
 }
 
 const postNewComment = async ({id, currentUser, newComment}) => {
@@ -121,11 +138,26 @@ const postNewComment = async ({id, currentUser, newComment}) => {
 export const useAddComment = () => {
     const queryClient = useQueryClient()
     return useMutation(postNewComment, {
-        // update handling
-        onSuccess: (response) => {
-            queryClient.setQueryData("post-comments", (oldPostComments) => {
-                return [...oldPostComments, response.comment] 
+        onMutate: async ({id, currentUser, newComment}) => {
+            await queryClient.cancelQueries(["post-comments", id])
+            const previousComments = queryClient.getQueryData(["post-comments", id])
+            queryClient.setQueryData(["post-comments", id], oldPostComments => {
+                return[
+                    ...oldPostComments,
+                    {
+                        author: currentUser.id,
+                        text: newComment,
+                        post: id,  
+                    }
+                ]
             })
+            return { previousComments }
+        },
+        onError: (_err, newCommentData, context) => {
+            queryClient.setQueryData(["post-comments", newCommentData.id], context.previousComments)
+        },
+        onSettled: (_data, _err, newCommentData) => {
+            queryClient.invalidateQueries(["post-comments", newCommentData.id])
         }
     })
 }
@@ -142,18 +174,27 @@ const deleteComment = async ({e, id}) => {
 export const useDeleteComment = () => {
     const queryClient = useQueryClient()
     return useMutation(deleteComment, {
-        onSuccess: (response) => {
-            queryClient.setQueryData("post-comments", oldComments => {
-                const newComments = [...oldComments]
-                const index = newComments.findIndex(comment => comment._id === response.id)
-                newComments.splice(index, 1)
-                return newComments
-            })
-        }    
+        onMutate: async ({ e, id }) => {
+            await queryClient.cancelQueries(["post-comments", id])
+            const previousComments = queryClient.getQueryData(["post-comments", id])
+            queryClient.setQueryData(["post-comments", id], oldPostComments => {
+                const newPostComments = [...oldPostComments]
+                const index = newPostComments.findIndex(comment => comment._id === e.target.id)
+                newPostComments.splice(index, 1)
+                return newPostComments
+            })            
+            return { previousComments }
+        },
+        onError: (_err, deletePostData, context) => {
+            queryClient.setQueryData(["post-comments", deletePostData.id], context.previousComments)
+        },
+        onSettled: (_err, _data, deletePostData) => {
+            queryClient.invalidateQueries(["post-comments", deletePostData.id])
+        }  
     })
 }
 
-const saveEdit = async ({e, id, editedComment}) => {
+const saveCommentEdit = async ({e, id, editedCommentText}) => {
     const res = await fetch(`http://localhost:8000/api/posts/${id}/comments/${e.target.id}`, {
             method: "PATCH",
             headers: {
@@ -161,22 +202,37 @@ const saveEdit = async ({e, id, editedComment}) => {
                 Authorization: 'Bearer ' + localStorage.getItem('token')
             },
             body: JSON.stringify({
-                text: editedComment
+                text: editedCommentText
             })
         })
         return await res.json()
 }
-export const useSaveEdit = () => {
+export const useSaveCommentEdit = () => {
     const queryClient = useQueryClient()
-    return useMutation(saveEdit, {
-        onSuccess: (response) => {
-            console.log(response.updatedComment)
-            queryClient.setQueryData("post-comments", (oldPostComments) => {
+    return useMutation(saveCommentEdit, {
+        onMutate: async ({e, id, editedCommentText}) => {
+            await queryClient.cancelQueries(["post-comments", id])
+            const previousComments = queryClient.getQueryData(["post-comments", id])
+            queryClient.setQueryData(["post-comments", id], oldPostComments => {
                 const newPostComments = [...oldPostComments]
-                const updatedCommentIndex = newPostComments.findIndex(post => post._id === response.updatedComment._id)
-                newPostComments.splice(updatedCommentIndex, 1, response.updatedComment)
+                const editedCommentIndex = newPostComments.findIndex(comment => comment._id === e.target.id)
+                const editedComment = newPostComments.find(comment => comment._id === e.target.id)
+                newPostComments.splice(
+                    editedCommentIndex, 
+                    1, 
+                    { 
+                        ...editedComment,
+                        text: editedCommentText 
+                    })
                 return newPostComments
-            })
+            })            
+            return { previousComments }
+        },
+        onError: (_err, editPostData, context) => {
+            queryClient.setQueryData(["post-comments", editPostData.id], context.previousComments)
+        },
+        onSettled: (_data, _err, editPostData) => {
+            queryClient.invalidateQueries(["post-comments", editPostData.id])
         }
     })
 }
@@ -193,39 +249,42 @@ const publishToggle = async ({ post }) => {
         }),
     })
     const data = await res.json()
+    console.log(data.updatedPost)
     return data.updatedPost
 }
-export const usePublishToggle = (id) => {
+export const usePublishToggle = () => {
     const queryClient = useQueryClient()
     return useMutation(publishToggle, {
-        onMutate: async updatedPost => {
-            await queryClient.cancelQueries(["post", id])
-            const previousPost = queryClient.getQueryData(["post", id])
-            queryClient.setQueryData(["post", id], updatedPost)
-            return { previousPost, updatedPost }
+        onMutate: async ({ post }) => {
+            await queryClient.cancelQueries(["post", post._id])
+            await queryClient.cancelQueries("posts")
+            const previousPost = queryClient.getQueryData(["post", post._id])
+            const previousPosts = queryClient.getQueryData("posts")
+            queryClient.setQueryData(["post", post._id], () => {
+                queryClient.setQueryData("posts", oldPosts => {
+                    const newPosts = [...oldPosts]
+                    const updatedPostIndex = newPosts.findIndex(newPost => newPost._id === post._id)
+                    // const oldPost = newPosts.find(newPost => newPost._id === post._id)
+                    newPosts.splice(updatedPostIndex, 1, { ...post, published: !post.published })
+                    return newPosts
+                })
+                return { ...post, published: !post.published } 
+            })
+            return { previousPost, previousPosts }
         },
-        onError: (err, updatedPost, context) => {
-            queryClient.setQueryData(["post", id], context.previousPost)
+        onError: (_err, { post }, context) => {
+            queryClient.setQueryData(["post", context.previousPost._id], context.previousPost)
+            queryClient.setQueryData("posts", context.previousPosts)
         },
-        onSettled: () => {
-            queryClient.invalidateQueries(["post", id])
+        onSettled: (_data, _err, { post }) => {
+            queryClient.invalidateQueries(["post", post._id])
+            queryClient.invalidateQueries("posts")
         }
-        // onSuccess: (response) => {
-        //     if (id) {
-        //         queryClient.setQueryData(["post", id], response)
-        //     }    
-        //     queryClient.setQueryData("posts", oldPosts => {
-        //         const newPosts = [...oldPosts]
-        //         const updatedPostIndex = newPosts.findIndex(post => post._id === response._id)
-        //         newPosts.splice(updatedPostIndex, 1, response)
-        //         return newPosts
-        //     })
-        // }
     })
 }
 
-const editPost = async ({ id, postData, values }) => {
-    const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
+const editPost = async ({ postData, values }) => {
+    const res = await fetch(`http://localhost:8000/api/posts/${postData._id}`, {
         method: "PUT",
         headers: { 
             'Content-Type': 'application/json',
@@ -242,16 +301,37 @@ const editPost = async ({ id, postData, values }) => {
         })
     })
     const data = await res.json()
-    //does not yet return updated post
+    //does not return updated post
     return data
 }
 export const useEditPost = (id) => {
     const queryClient = useQueryClient()
     return useMutation(editPost, {
-        onSuccess: () => {
-            if (id) {
-                queryClient.invalidateQueries(["post", id])
-            }    
+        onMutate: async ({ postData, values }) => {
+            await queryClient.cancelQueries(["post", postData._id])
+            await queryClient.cancelQueries("posts")
+            const previousPost = queryClient.getQueryData(["post"], postData._id)
+            const previousPosts = queryClient.getQueryData("posts")
+            queryClient.setQueryData(["post", postData._id], oldPost => {
+                return { 
+                    ...oldPost,
+                    _id: postData._id,
+                    author: postData.author ? postData.author : null,
+                    title: values.title,
+                    text: values.text,
+                    published: values.published,
+                    imgUrl: postData.imgUrl,
+                    timestamp: postData.timestamp  
+                } 
+            })
+            return { previousPost, previousPosts }
+        },
+        onError: (_err, _updatedPost, context) => {
+            queryClient.setQueryData(["post", context.previousPost._id], context.previousPost)
+            queryClient.setQueryData("posts", context.previousPosts)
+        },
+        onSettled: (_data, _err, editedPost) => {
+            queryClient.invalidateQueries(["post", editedPost.postData._id])
             queryClient.invalidateQueries("posts")
         }
     })
@@ -271,7 +351,6 @@ const createPost = async ({ currentUser, newPost }) => {
             imgUrl: newPost.imgUrl,
             text: newPost.text,
             published: newPost.published,
-
         })
     })
     const data = await res.json()
@@ -281,7 +360,25 @@ const createPost = async ({ currentUser, newPost }) => {
 export const useCreatePost = () => {
     const queryClient = useQueryClient()
     return useMutation(createPost, {
-        onSuccess: (response) => {
+        onMutate: async ({ currentUser, newPost }) => {
+            await queryClient.cancelQueries("posts")
+            const previousPostData = queryClient.getQueryData("posts")
+            queryClient.setQueryData("posts", oldPostsData => {
+                console.log(oldPostsData)
+                return [{
+                    author: currentUser.id,
+                    title: newPost.title,
+                    imgUrl: newPost.imgUrl,
+                    text: newPost.text,
+                    published: newPost.published,
+                }, ...oldPostsData]
+            })
+            return { previousPostData }
+        },
+        onError: (_error, _newPostData, context) => {
+            queryClient.setQueryData("posts", context.previousPostData)
+        },
+        onSettled: () => {
             queryClient.invalidateQueries("posts")
         }
     })
@@ -306,7 +403,6 @@ export const useCreateUser = () => {
     return useMutation(createUser, {
         onSuccess: (response) => {
             queryClient.setQueryData("users", (oldUsers) => {
-                console.log(oldUsers)
                 return [response,...oldUsers] 
             })
         }

@@ -53,7 +53,7 @@ function Comment({
                                 ) : null}
                             <div className="comment-details">
                                 <p className="comment-author">{comment.author.username}</p>
-                                <p className="comment-date">{formatCommentDate(comment.timestamp)}</p>
+                                <p className="comment-date">{comment.timestamp ? formatCommentDate(comment.timestamp) : "less than a minute ago"}</p>
                             </div> 
                         </div>    
                     </div>
