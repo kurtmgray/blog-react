@@ -1,8 +1,11 @@
-
-
+@font-face {
+  font-family: "Syne Mono", monospace;
+  src: local("Syne Mono"), url("./components/fonts/SyneMono-Regular.ttf");
+}
 
 .App {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -13,7 +16,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* padding: 1rem;  */
 }
 
 .navbar-links {
@@ -22,8 +24,8 @@
   justify-content: space-between;
 }
 
-.navbar-link{
-  padding: .5rem
+.navbar-link {
+  padding: 0.5rem;
 }
 
 .hero {
@@ -31,7 +33,7 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  margin: .83rem
+  margin: 0.83rem;
 }
 
 .hero-text {
@@ -39,8 +41,11 @@
   color: rgb(70, 70, 70);
   padding: 3rem;
   margin-right: 2rem;
-  width: 400px
+  width: 400px;
+}
 
+.title {
+  font-family: "Syne Mono", monospace;
 }
 
 .posts-container {
@@ -79,14 +84,14 @@
 .login-container,
 .signup-container,
 .create-container {
-  display:flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .login,
-.logout, 
-.signup, 
+.logout,
+.signup,
 .create {
   display: flex;
   flex-direction: column;
@@ -94,17 +99,17 @@
   align-items: center;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   padding: 2rem;
-  margin-top: 2rem
+  margin-top: 2rem;
 }
 
 .dashboard-posts-container {
-  padding-top: .5rem
+  padding-top: 0.5rem;
 }
 
 .dashboard-post {
   display: flex;
   align-items: center;
-  padding: .5rem 1.5rem;
+  padding: 0.5rem 1.5rem;
 }
 
 .db-post-img {
@@ -114,17 +119,17 @@
 }
 
 .db-post-title {
-  flex: 2
+  flex: 2;
 }
 
 .db-post-text-preview {
-  flex: 3 
+  flex: 3;
 }
 
 .admin-post {
   display: flex;
   align-items: center;
-  padding: .5rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
 }
 
@@ -133,15 +138,15 @@
   /* height: 100%; */
   width: 100%;
   object-fit: contain;
-  flex: 1
+  flex: 1;
 }
 
-.post-details{
+.post-details {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex: 1
+  flex: 1;
   /* min-width: 180px */
 }
 
@@ -150,11 +155,11 @@
 }
 
 .post-text-preview {
-  flex: 3 
+  flex: 3;
 }
 
 .post-element {
-  margin: .5rem;
+  margin: 0.5rem;
   text-decoration: none;
 }
 
@@ -170,22 +175,22 @@
   justify-content: space-between;
   width: 400px;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
-  padding: 10px
+  padding: 10px;
 }
 
 .comment-text {
   font-size: 1.1em;
   font-weight: 500;
-  margin: 2px
+  margin: 2px;
 }
 
 .comment-details {
   text-align: right;
   font-style: italic;
-  margin-left: auto
+  margin-left: auto;
 }
 
-.comment-date, 
+.comment-date,
 .comment-author {
   margin: 10px;
   text-align: end;
@@ -194,15 +199,14 @@
 
 .comment-tools {
   display: flex;
-  justify-content: space-between
+  justify-content: space-between;
 }
 
 .comment-container {
-  gap: 4px
+  gap: 4px;
 }
 
-
-input:not([type="checkbox"]){
+input:not([type="checkbox"]) {
   display: block;
   width: 20rem;
   height: 2rem;
@@ -215,45 +219,48 @@ input:not([type="checkbox"]){
 input[type="checkbox"] {
   width: 1.3rem;
   height: 1.3rem;
-  padding: .5rem
+  padding: 0.5rem;
 }
 
 .title-input,
 .imgUrl-input {
   border: 1px solid #ccc;
-  margin-right: auto
+  margin-right: auto;
 }
 
 .title,
 .imgUrl,
 .text-input {
-  margin-right: auto
+  margin-right: auto;
 }
 
 textarea.new-post {
   display: block;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   width: 400px;
   height: 400px;
-  padding: .5rem;
+  padding: 0.5rem;
   font-size: 1.1em;
   font-weight: 500;
-  border-radius: 10px
+  border-radius: 10px;
 }
 
 textarea.new-comment {
   display: block;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   width: 400px;
   height: 100px;
-  padding: .5rem;
+  padding: 0.5rem;
   font-size: 1.1em;
   font-weight: 500;
-  border-radius: 10px
+  border-radius: 10px;
 }
 
 textarea.edit-comment {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   width: 392px;
   border-radius: 5px;
   border: none;
@@ -272,7 +279,7 @@ form:not([label]):not(.comment) {
 
 label {
   text-align: left;
-  padding: .2rem
+  padding: 0.2rem;
 }
 
 /* button:not(.admin-button):not(.edit-button) {
@@ -286,23 +293,23 @@ label {
 } */
 
 .admin-button-container,
-.comment-edit-buttons  {
-display: flex;
-flex-direction: row;
-justify-content: flex-end;
-width: 164px;
-margin: 5px;
-align-self: flex-end;
+.comment-edit-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 164px;
+  margin: 5px;
+  align-self: flex-end;
 }
 
 button,
-.admin-button, 
+.admin-button,
 .edit-button {
   border: none;
-  margin: .2rem;
-  padding: .2rem;
+  margin: 0.2rem;
+  padding: 0.2rem;
   width: 8rem;
-  font-size: .8em;
+  font-size: 0.8em;
   border-radius: 0.2rem;
   cursor: pointer;
 }
