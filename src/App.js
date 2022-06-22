@@ -10,6 +10,7 @@ import Dashboard from "./components/Dashboard";
 import SinglePost from "./components/SinglePost";
 import EditPost from "./components/EditPost";
 import Logout from "./components/Logout";
+import GoogleAuth from "./components/GoogleAuth";
 import { useCurrentUser, usePostData } from "./hooks/usePostData";
 import { ReactQueryDevtools } from "react-query/devtools";
 
@@ -29,6 +30,7 @@ function App() {
             <Route path="/" element={<Home posts={posts} />}></Route>
             <Route path="/admin" element={<Admin />}></Route>
             <Route path="/login" element={<Login />}></Route>
+            <Route path="/auth/google" element={<GoogleAuth />}></Route>
             <Route path="/logout" element={<Logout />}></Route>
             <Route path="/create" element={<Create />}></Route>
             <Route path="/signup" element={<Signup />}></Route>

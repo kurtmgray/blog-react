@@ -17,19 +17,34 @@ export const useCurrentUser = () => {
 };
 
 const login = async ({ values }) => {
-  const res = await fetch("http://localhost:8000/api/users/login", {
-    method: "POST",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify({
-      username: values.username,
-      password: values.password,
-    }),
-  });
-  const data = await res.json();
+  if (values.user) {
+    // console.log("google auth pathway");
+    const res = await fetch("http://localhost:8000/api/users/login", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify({
+        googleId: values.user.sub,
+        profile: values.user,
+      }),
+    });
+    const data = await res.json();
+    return data;
+  } else {
+    // console.log("non oauth pathway");
+    const res = await fetch("http://localhost:8000/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password,
+      }),
+    });
+    const data = await res.json();
 
-  return data;
+    return data;
+  }
 };
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -371,6 +386,10 @@ export const useEditPost = (id) => {
 };
 
 const createPost = async ({ currentUser, newPost }) => {
+  function generateImageSourceUrl() {
+    const hash = Math.floor(Math.random() * 1000);
+    return `https://picsum.photos/id/${hash}/250`;
+  }
   console.log(currentUser, newPost);
   const res = await fetch("http://localhost:8000/api/posts/", {
     method: "POST",
@@ -381,7 +400,7 @@ const createPost = async ({ currentUser, newPost }) => {
     body: JSON.stringify({
       author: currentUser.id,
       title: newPost.title,
-      imgUrl: newPost.imgUrl,
+      imgUrl: newPost.imgUrl === "" ? generateImageSourceUrl() : newPost.imgUrl,
       text: newPost.text,
       published: newPost.published,
     }),

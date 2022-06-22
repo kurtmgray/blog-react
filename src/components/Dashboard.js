@@ -15,8 +15,8 @@ function Dashboard() {
     }
   }, [currentUser, navigate]);
 
-  console.log(posts);
-  console.log(currentUser);
+  // console.log(posts);
+  // console.log(currentUser);
 
   const userPosts = posts.filter((post) => post.author._id === currentUser.id);
 

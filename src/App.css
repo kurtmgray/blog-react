@@ -222,13 +222,13 @@ input[type="checkbox"] {
   padding: 0.5rem;
 }
 
-.title-input,
+.create-post-title-input,
 .imgUrl-input {
   border: 1px solid #ccc;
   margin-right: auto;
 }
 
-.title,
+.create-post-title,
 .imgUrl,
 .text-input {
   margin-right: auto;
@@ -321,4 +321,9 @@ button:hover {
   font-size: 1.2em;
   text-align: center;
   color: #36a936;
+}
+
+#signInDiv {
+  padding-top: 2rem;
+  padding-bottom: 0.5rem;
 }
