@@ -121,7 +121,7 @@ function SinglePost() {
               <button
                 id={singlePost._id}
                 onClick={handlePubToggle}
-                disabled={!currentUser.canPublish}
+                disabled={!currentUser.canPublish && !singlePost.published}
               >
                 {singlePost.published ? "Unpublish Post" : "Publish Post"}
               </button>

@@ -355,6 +355,7 @@ export const usePublishToggle = () => {
 };
 
 const editPost = async ({ postData, values }) => {
+  console.log(values.imgUrl);
   const res = await fetch(
     `https://murmuring-dusk-26608.herokuapp.com/api/posts/${postData._id}`,
     {
@@ -369,7 +370,7 @@ const editPost = async ({ postData, values }) => {
         title: values.title,
         text: values.text,
         published: values.published,
-        imgUrl: postData.imgUrl,
+        imgUrl: values.imgUrl,
         timestamp: postData.timestamp,
       }),
     }
@@ -387,6 +388,7 @@ export const useEditPost = (id) => {
       const previousPost = queryClient.getQueryData(["post"], postData._id);
       const previousPosts = queryClient.getQueryData("posts");
       queryClient.setQueryData(["post", postData._id], (oldPost) => {
+        console.log(values);
         return {
           ...oldPost,
           _id: postData._id,
@@ -394,7 +396,7 @@ export const useEditPost = (id) => {
           title: values.title,
           text: values.text,
           published: values.published,
-          imgUrl: postData.imgUrl,
+          imgUrl: values.imgUrl,
           timestamp: postData.timestamp,
         };
       });

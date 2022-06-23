@@ -88,22 +88,32 @@ function Create() {
             onEditorChange={(text) => setNewPost((v) => ({ ...v, text: text }))}
           ></Editor>
           <div className="publish">
-            <label htmlFor="published">
-              <h3>Publish?</h3>
-            </label>
-            <input
-              type="checkbox"
-              name="published"
-              rows="5"
-              columns="32"
-              onClick={(e) =>
-                setNewPost((v) => ({ ...v, [e.target.name]: e.target.checked }))
-              }
-              disabled={!currentUser.canPublish}
-            ></input>
+            {currentUser.canPublish ? (
+              <div>
+                <label htmlFor="published">
+                  <h3>Publish?</h3>
+                </label>
+                <input
+                  type="checkbox"
+                  name="published"
+                  rows="5"
+                  columns="32"
+                  onClick={(e) =>
+                    setNewPost((v) => ({
+                      ...v,
+                      [e.target.name]: e.target.checked,
+                    }))
+                  }
+                ></input>{" "}
+              </div>
+            ) : (
+              <div>
+                <p display={true}>You do not have permission to publish.</p>
+              </div>
+            )}
           </div>
-          <button type="submit" disabled={disable}>
-            Submit Post
+          <button type="submit">
+            Submit {!currentUser.canPublish && "for Approval"}
           </button>
         </form>
       </div>
