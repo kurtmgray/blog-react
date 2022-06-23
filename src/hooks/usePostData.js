@@ -4,11 +4,14 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 const fetchCurrentUser = async () => {
   const token = localStorage.getItem("token");
   if (!token) return null;
-  const res = await fetch("http://localhost:8000/api/users", {
-    headers: {
-      Authorization: "Bearer " + token,
-    },
-  });
+  const res = await fetch(
+    "https://murmuring-dusk-26608.herokuapp.com/api/users",
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
   const data = await res.json();
   return data.user;
 };
@@ -19,28 +22,34 @@ export const useCurrentUser = () => {
 const login = async ({ values }) => {
   if (values.user) {
     // console.log("google auth pathway");
-    const res = await fetch("http://localhost:8000/api/users/login", {
-      method: "POST",
-      headers: { "Content-type": "application/json" },
-      body: JSON.stringify({
-        googleId: values.user.sub,
-        profile: values.user,
-      }),
-    });
+    const res = await fetch(
+      "https://murmuring-dusk-26608.herokuapp.com/api/users/login",
+      {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+          googleId: values.user.sub,
+          profile: values.user,
+        }),
+      }
+    );
     const data = await res.json();
     return data;
   } else {
     // console.log("non oauth pathway");
-    const res = await fetch("http://localhost:8000/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        username: values.username,
-        password: values.password,
-      }),
-    });
+    const res = await fetch(
+      "https://murmuring-dusk-26608.herokuapp.com/api/users/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+        }),
+      }
+    );
     const data = await res.json();
 
     return data;
@@ -61,7 +70,9 @@ export const useLogin = () => {
 };
 
 const fetchAllPosts = async () => {
-  const res = await fetch("http://localhost:8000/api/posts");
+  const res = await fetch(
+    "https://murmuring-dusk-26608.herokuapp.com/api/posts"
+  );
   const data = await res.json();
   const timeSortedPosts = data.posts.sort((a, b) =>
     b.timestamp > a.timestamp ? 1 : -1
@@ -73,11 +84,14 @@ export const usePostData = () => {
 };
 
 const fetchSinglePost = async (id) => {
-  const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-  });
+  const res = await fetch(
+    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}`,
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    }
+  );
   const data = await res.json();
   return data.post;
 };
@@ -86,12 +100,15 @@ export const useSinglePost = (id) => {
 };
 
 const deleteSinglePost = async ({ id }) => {
-  const res = await fetch(`http://localhost:8000/api/posts/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-  });
+  const res = await fetch(
+    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    }
+  );
   const deletedPost = await res.json();
   return deletedPost;
 };
@@ -120,11 +137,14 @@ export const useDeleteSinglePost = () => {
 };
 
 const fetchPostComments = async (id) => {
-  const res = await fetch(`http://localhost:8000/api/posts/${id}/comments`, {
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-  });
+  const res = await fetch(
+    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments`,
+    {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    }
+  );
   const data = await res.json();
   const timeSortedComments = data.comments.sort((a, b) =>
     b.timestamp > a.timestamp ? -1 : 1
@@ -136,18 +156,21 @@ export const usePostComments = (id) => {
 };
 
 const postNewComment = async ({ id, currentUser, newComment }) => {
-  const res = await fetch(`http://localhost:8000/api/posts/${id}/comments`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-    body: JSON.stringify({
-      author: currentUser.id,
-      text: newComment,
-      post: id,
-    }),
-  });
+  const res = await fetch(
+    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({
+        author: currentUser.id,
+        text: newComment,
+        post: id,
+      }),
+    }
+  );
   return await res.json();
 };
 export const useAddComment = () => {
@@ -187,7 +210,7 @@ export const useAddComment = () => {
 
 const deleteComment = async ({ e, id }) => {
   const res = await fetch(
-    `http://localhost:8000/api/posts/${id}/comments/${e.target.id}`,
+    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments/${e.target.id}`,
     {
       method: "DELETE",
       headers: {
@@ -227,7 +250,7 @@ export const useDeleteComment = () => {
 
 const saveCommentEdit = async ({ e, id, editedCommentText }) => {
   const res = await fetch(
-    `http://localhost:8000/api/posts/${id}/comments/${e.target.id}`,
+    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments/${e.target.id}`,
     {
       method: "PATCH",
       headers: {
@@ -276,16 +299,19 @@ export const useSaveCommentEdit = () => {
 };
 
 const publishToggle = async ({ post }) => {
-  const res = await fetch(`http://localhost:8000/api/posts/${post._id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-    body: JSON.stringify({
-      published: !post.published,
-    }),
-  });
+  const res = await fetch(
+    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${post._id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({
+        published: !post.published,
+      }),
+    }
+  );
   const data = await res.json();
   console.log(data.updatedPost);
   return data.updatedPost;
@@ -329,22 +355,25 @@ export const usePublishToggle = () => {
 };
 
 const editPost = async ({ postData, values }) => {
-  const res = await fetch(`http://localhost:8000/api/posts/${postData._id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-    body: JSON.stringify({
-      _id: postData._id,
-      author: postData.author ? postData.author : null,
-      title: values.title,
-      text: values.text,
-      published: values.published,
-      imgUrl: postData.imgUrl,
-      timestamp: postData.timestamp,
-    }),
-  });
+  const res = await fetch(
+    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${postData._id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({
+        _id: postData._id,
+        author: postData.author ? postData.author : null,
+        title: values.title,
+        text: values.text,
+        published: values.published,
+        imgUrl: postData.imgUrl,
+        timestamp: postData.timestamp,
+      }),
+    }
+  );
   const data = await res.json();
   //does not return updated post
   return data;
@@ -391,20 +420,24 @@ const createPost = async ({ currentUser, newPost }) => {
     return `https://picsum.photos/id/${hash}/250`;
   }
   console.log(currentUser, newPost);
-  const res = await fetch("http://localhost:8000/api/posts/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-    body: JSON.stringify({
-      author: currentUser.id,
-      title: newPost.title,
-      imgUrl: newPost.imgUrl === "" ? generateImageSourceUrl() : newPost.imgUrl,
-      text: newPost.text,
-      published: newPost.published,
-    }),
-  });
+  const res = await fetch(
+    "https://murmuring-dusk-26608.herokuapp.com/api/posts/",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({
+        author: currentUser.id,
+        title: newPost.title,
+        imgUrl:
+          newPost.imgUrl === "" ? generateImageSourceUrl() : newPost.imgUrl,
+        text: newPost.text,
+        published: newPost.published,
+      }),
+    }
+  );
   const data = await res.json();
   console.log(data);
   return data.post;
@@ -443,16 +476,19 @@ export const useCreatePost = () => {
 };
 
 const createUser = async ({ userData }) => {
-  const res = await fetch("http://localhost:8000/api/users", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: userData.username,
-      password: userData.password,
-      fname: userData.fname,
-      lname: userData.lname,
-    }),
-  });
+  const res = await fetch(
+    "https://murmuring-dusk-26608.herokuapp.com/api/users",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: userData.username,
+        password: userData.password,
+        fname: userData.fname,
+        lname: userData.lname,
+      }),
+    }
+  );
   const data = await res.json();
   console.log(data);
 };
