@@ -118,7 +118,11 @@ function SinglePost() {
               <button id={singlePost._id} onClick={handleEditPost}>
                 Edit Post
               </button>
-              <button id={singlePost._id} onClick={handlePubToggle}>
+              <button
+                id={singlePost._id}
+                onClick={handlePubToggle}
+                disabled={!currentUser.canPublish}
+              >
                 {singlePost.published ? "Unpublish Post" : "Publish Post"}
               </button>
             </div>

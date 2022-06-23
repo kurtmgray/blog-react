@@ -99,6 +99,7 @@ function Create() {
               onClick={(e) =>
                 setNewPost((v) => ({ ...v, [e.target.name]: e.target.checked }))
               }
+              disabled={!currentUser.canPublish}
             ></input>
           </div>
           <button type="submit" disabled={disable}>
