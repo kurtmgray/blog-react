@@ -69,7 +69,7 @@ function Create() {
             <h3>Content:</h3>
           </label>
           <Editor
-            apiKey="vs2svkfmnbjh55w224iibrp0wuz7u8oj90t57boctnrbcgrg"
+            apiKey={process.env.REACT_APP_EDITOR_KEY}
             init={{
               height: 400,
               menubar: false,
