@@ -317,6 +317,15 @@ button,
 button:hover {
   background-color: #c5c5c5;
 }
+
+a {
+  text-decoration: "none";
+  color: black;
+}
+
+a:hover {
+  color: rgb(94, 184, 226);
+}
 .message {
   font-size: 1.2em;
   text-align: center;

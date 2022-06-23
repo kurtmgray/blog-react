@@ -47,7 +47,12 @@ function Home({ posts }) {
                   />
                 </a>
                 <h3 className="post-title">
-                  <a href={`/posts/${post._id}`}>{post.title}</a>
+                  <a
+                    href={`/posts/${post._id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    {post.title}
+                  </a>
                   {post.author ? post.author.username : "anonymous"}
                 </h3>
               </div>
