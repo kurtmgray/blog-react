@@ -54,64 +54,74 @@ function EditPost() {
 
   if (isLoading) return <p>Loading...</p>;
   return (
-    <div>
+    <div className="edit">
       <h1>Edit Post</h1>
+
       <form onSubmit={handleSubmit}>
-        <label htmlFor="title">Post Title:</label>
-        <input
-          type="text"
-          name="title"
-          value={values.title}
-          onChange={(e) =>
-            setValues((v) => ({
-              ...v,
-              [e.target.name]: e.target.value,
-              published: false,
-            }))
-          }
-          required
-        ></input>
-        <label htmlFor="title">Image URL:</label>
-        <input
-          type="text"
-          name="imgUrl"
-          value={values.imgUrl}
-          onChange={(e) => {
-            setValues((v) => ({
-              ...v,
-              imgUrl: e.target.value,
-              published: false,
-            }));
-            console.log(values);
-          }}
-          required
-        ></input>
-        <label className="text-input" htmlFor="text">
-          <h3>Content:</h3>
-        </label>
-        <Editor
-          apiKey="vs2svkfmnbjh55w224iibrp0wuz7u8oj90t57boctnrbcgrg"
-          init={{
-            height: 400,
-            menubar: false,
-            plugins: [
-              "advlist autolink lists link image",
-              "charmap print preview anchor help",
-              "searchreplace visualblocks code",
-              "insertdatetime media table paste wordcount",
-            ],
-            toolbar:
-              // prettier-ignore
-              "undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help",
-          }}
-          value={values.text}
-          textareaName="text"
-          onEditorChange={(text) =>
-            setValues((v) => ({ ...v, text: text, published: false }))
-          }
-        ></Editor>
+        <div>
+          <label htmlFor="title">
+            <h3>Post Title:</h3>
+          </label>
+          <input
+            type="text"
+            name="title"
+            value={values.title}
+            onChange={(e) =>
+              setValues((v) => ({
+                ...v,
+                [e.target.name]: e.target.value,
+                published: false,
+              }))
+            }
+            required
+          ></input>
+          <label htmlFor="title">
+            <h3>Image URL:</h3>
+          </label>
+          <input
+            type="text"
+            name="imgUrl"
+            value={values.imgUrl}
+            onChange={(e) => {
+              setValues((v) => ({
+                ...v,
+                imgUrl: e.target.value,
+                published: false,
+              }));
+              console.log(values);
+            }}
+            required
+          ></input>
+        </div>
+        <div>
+          <label className="text-input" htmlFor="text">
+            <h3>Content:</h3>
+          </label>
+          <Editor
+            apiKey="vs2svkfmnbjh55w224iibrp0wuz7u8oj90t57boctnrbcgrg"
+            init={{
+              height: 400,
+              menubar: false,
+              plugins: [
+                "advlist autolink lists link image",
+                "charmap print preview anchor help",
+                "searchreplace visualblocks code",
+                "insertdatetime media table paste wordcount",
+              ],
+              toolbar:
+                // prettier-ignore
+                "undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | help",
+            }}
+            value={values.text}
+            textareaName="text"
+            onEditorChange={(text) =>
+              setValues((v) => ({ ...v, text: text, published: false }))
+            }
+          ></Editor>
+        </div>
+
         {currentUser.canPublish ? (
-          <div>
+          <div className="publish-toggle">
             <label htmlFor="published">Publish?</label>
             <input
               type="checkbox"

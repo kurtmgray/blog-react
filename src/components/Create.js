@@ -89,10 +89,8 @@ function Create() {
           ></Editor>
           <div className="publish">
             {currentUser.canPublish ? (
-              <div>
-                <label htmlFor="published">
-                  <h3>Publish?</h3>
-                </label>
+              <div className="publish-toggle">
+                <label htmlFor="published">Publish?</label>
                 <input
                   type="checkbox"
                   name="published"
