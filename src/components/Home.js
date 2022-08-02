@@ -13,7 +13,7 @@ function Home({ posts }) {
             from the shackles of your captive mind.{" "}
             <Link to="/signup"> Sign Up Here</Link> and show us what you've got.
             Come and see what we've all got to say, then stick around to share
-            one or several ... <strong>Brain Thoughts .</strong>
+            your <strong>Brain Thoughts .</strong>
           </p>
           <button>
             <Link to="/signup" style={{ textDecoration: "none" }}>
@@ -22,7 +22,7 @@ function Home({ posts }) {
           </button>
         </div>
         <div className="hero-img">
-          <img src={homeLogo} height="400" width="400" alt="svgblogimage"></img>
+          <img src={homeLogo} height="250" width="250" alt="svgblogimage"></img>
         </div>
       </div>
 
