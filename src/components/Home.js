@@ -10,11 +10,10 @@ function Home({ posts }) {
           <h1 className="title">Brain Thoughts .</h1>
           <p>
             Come and see! This is the place to let your inhibitions run free
-            from the shackles of your captive mind. You're better off without
-            them anyway, unless you're just going to say something terrible or
-            stupid. <Link to="/signup"> Sign Up Here</Link> and show us what
-            you've got. Come and see what we've all got to say, then stick
-            around to share one or several ... Brain Thoughts .
+            from the shackles of your captive mind.{" "}
+            <Link to="/signup"> Sign Up Here</Link> and show us what you've got.
+            Come and see what we've all got to say, then stick around to share
+            one or several ... <strong>Brain Thoughts .</strong>
           </p>
           <button>
             <Link to="/signup" style={{ textDecoration: "none" }}>
