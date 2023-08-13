@@ -64,7 +64,6 @@ function SinglePost() {
   if (singlePostIsLoading) return <p>loading...</p>;
 
   return (
-    <div>
       <div className="single-post-container">
         <img
           className="post-img"
@@ -128,7 +127,6 @@ function SinglePost() {
             </div>
           )}
       </div>
-    </div>
   );
 }
 
