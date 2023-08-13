@@ -89,6 +89,15 @@ body {
   justify-content: center;
 }
 
+.single-post-container pre {
+  white-space: pre-wrap;      
+  /* word-wrap: break-word;      */
+  overflow-x: auto;          /* add horizontal scroll if needed */
+  max-width: 100%;          
+  border: 1px solid #ccc;   
+  padding: 10px;             
+}
+
 .login-container,
 .signup-container,
 .create-container {
