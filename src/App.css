@@ -68,6 +68,8 @@ body {
 .post-img {
   max-width: 100%;
   object-fit: contain;
+  max-width: 250px;      
+  max-height: 250px;
 }
 
 .post-title {
