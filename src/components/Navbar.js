@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCurrentUser } from "../hooks/usePostData";
-import navLogo from "./assets/svg/navLogo.svg";
+import navLogo from "./assets/svg/nav-logo.svg";
 
 function Navbar() {
   const { data: currentUser } = useCurrentUser();
