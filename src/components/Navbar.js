@@ -1,10 +1,11 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import React from "react";
 import { useCurrentUser } from "../hooks/usePostData";
-import navLogo from "./assets/svg/nav-logo.svg";
+import navLogo from "./assets/svg/navLogo.svg";
 
 function Navbar() {
   const { data: currentUser } = useCurrentUser();
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="navbar">
@@ -13,22 +14,33 @@ function Navbar() {
           <img src={navLogo} alt="navLogo" />
         </Link>
       </div>
-      <div className="navbar-links">
+
+      <button 
+        className="hamburger" 
+        onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+      >
+        ☰
+      </button>
+
+      <div 
+        className="navbar-links" 
+        style={{ display: isMobileMenuOpen ? 'block' : 'none' }}
+      >
         <h3 className="navbar-link">
           <Link to="/" style={{ textDecoration: "none" }}>
-            Home{" "}
+            Home
           </Link>
         </h3>
         {!currentUser ? (
           <div className="navbar-links">
             <h3 className="navbar-link">
               <Link to="/signup" style={{ textDecoration: "none" }}>
-                Sign Up{" "}
+                Sign Up
               </Link>
             </h3>
             <h3 className="navbar-link">
               <Link to="/login" style={{ textDecoration: "none" }}>
-                Log In{" "}
+                Log In
               </Link>
             </h3>
           </div>
@@ -36,12 +48,12 @@ function Navbar() {
           <div className="navbar-links">
             <h3 className="navbar-link">
               <Link to="/create" style={{ textDecoration: "none" }}>
-                Create{" "}
+                Create
               </Link>
             </h3>
             <h3 className="navbar-link">
               <Link to="/dashboard" style={{ textDecoration: "none" }}>
-                Dashboard{" "}
+                Dashboard
               </Link>
             </h3>
             <h3 className="navbar-link">
@@ -54,7 +66,7 @@ function Navbar() {
         {currentUser && currentUser.admin ? (
           <h3 className="navbar-link">
             <Link to="/admin" style={{ textDecoration: "none" }}>
-              Admin{" "}
+              Admin
             </Link>
           </h3>
         ) : null}
