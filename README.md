@@ -14,11 +14,11 @@ This is a blog application built with React.
 
 ### Install Dependencies
 
-\'npm install\'
+`npm install`
 
 ### Run
 
-\'npm start\'
+`npm start`
 
 This will run the app in development mode. Open http://localhost:3000 to view it in the browser.
 
@@ -26,7 +26,7 @@ The page will reload if you make edits. You will also see any lint errors in the
 
 ### Build
 
-\'npm run build\'
+`npm run build`
 
 Builds the app for production to the build folder. It correctly bundles React in production mode and optimizes the build for the best performance.
 
@@ -43,3 +43,4 @@ This app uses a REST API built with Node/Express hosted at: https://github.com/k
 - React Query
 - REST API (https://github.com/kurtmgray/blog-api)
 
+Contact for protected keys.
