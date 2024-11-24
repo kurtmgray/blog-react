@@ -10,16 +10,16 @@ import Dashboard from "./components/Dashboard";
 import SinglePost from "./components/SinglePost";
 import EditPost from "./components/EditPost";
 import Logout from "./components/Logout";
+import Loading from "./components/Loading";
 import GoogleAuth from "./components/GoogleAuth";
-import { useCurrentUser, usePostData } from "./hooks/usePostData";
-import { ReactQueryDevtools } from "react-query/devtools";
+import { usePostData } from "./hooks/usePostData";
+
 
 function App() {
-  const { data: currentUser } = useCurrentUser();
   const { data: posts, isLoading, isError } = usePostData();
 
   if (isError) return "Error...";
-  if (isLoading) return "Loading...";
+  if (isLoading) return <Loading message="Fetching posts..." />;
 
   return (
     <>
@@ -40,7 +40,6 @@ function App() {
           </Routes>
         </BrowserRouter>
       </div>
-      {/* <ReactQueryDevtools initialIsOpen={true} /> */}
     </>
   );
 }

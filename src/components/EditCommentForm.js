@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Loading from './Loading';
 
 function EditCommentForm({ comment, editedComment, setEditedComment, toggleEditMode, onSaveEdit }) {
 
@@ -11,7 +12,7 @@ function EditCommentForm({ comment, editedComment, setEditedComment, toggleEditM
         toggleEditMode()
     }
 
-    if (!editedComment) return "Loading..."
+    if (!editedComment) return <Loading message="Loading comments..." />
     
     return ( 
         <div >

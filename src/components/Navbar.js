@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import React from "react";
 import { useCurrentUser } from "../hooks/usePostData";
 import navLogo from "./assets/svg/nav-logo.svg";
+import "./fonts/SyneMono-Regular.ttf";
+
 
 function Navbar() {
   const { data: currentUser } = useCurrentUser();

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import Loading from "./Loading";
 import parse from "html-react-parser";
 import { usePostData, useCurrentUser } from "../hooks/usePostData";
 
@@ -15,19 +16,15 @@ function Dashboard() {
     }
   }, [currentUser, navigate]);
 
-  // console.log(posts);
-  // console.log(currentUser);
-
   const userPosts = posts.filter((post) => post.author._id === currentUser.id);
 
   const preview = (text) => {
     return text.length > 200 ? text.slice(0, 200) + "..." : text.slice(0, 200);
   };
-  if (postsIsLoading) {
-    console.log("loading");
-    return "Updating posts";
+  if (postsIsLoading || !userPosts) {
+    return <Loading message="Loading posts..." />;
   }
-  if (!userPosts) return "Updating user posts...";
+  // if (!userPosts) return "Updating user posts...";
 
   return (
     <div>

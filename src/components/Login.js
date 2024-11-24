@@ -17,18 +17,14 @@ function Login() {
   const { mutate: login } = useLogin();
 
   async function handleCallbackResponse(response) {
-    console.log("encoded JWT id token: " + response.credential);
     let userObject = await jwt_decode(response.credential);
-    console.log(userObject);
-    setValues({ ...values, user: userObject });
-    // login({ values });
-    // setValues({ ...values, user: null });
+    setValues(prev => ({ ...prev, user: userObject }));
   }
 
   useEffect(() => {
     if (values.user) {
       login({ values });
-      setValues({ ...values, user: null });
+      setValues(prev => ({ ...prev, user: null }));
     }
   }, [values.user]);
 
@@ -87,9 +83,6 @@ function Login() {
           ></input>
           {err ? <p>{err.message}</p> : null}
           <button type="submit">Log In</button>
-          {/* <div>
-            <a href="http://localhost:8000/auth/google">Sign in with Google</a>
-          </div> */}
         </form>
         <div id="signInDiv"></div>
       </div>

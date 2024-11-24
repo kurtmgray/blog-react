@@ -28,13 +28,13 @@ function Home({ posts }) {
 
       <hr />
 
-      <h2>Posts({posts.filter((post) => post.published).length})</h2>
+      <h2 className="posts-h2">Posts({posts.filter((post) => post.published).length})</h2>
       <div className="posts-container">
         {posts.map((post) => {
           if (post.published) {
             return (
               <div className="post-card" key={post._id}>
-                <a href={`/posts/${post._id}`}>
+                <a className="post-a" href={`/posts/${post._id}`}>
                   <img
                     className="post-img"
                     src={
@@ -45,15 +45,19 @@ function Home({ posts }) {
                     alt="pic"
                   />
                 </a>
-                <h3 className="post-title">
-                  <a
-                    href={`/posts/${post._id}`}
-                    style={{ textDecoration: "none" }}
-                  >
-                    {post.title}
-                  </a>
-                  {post.author ? post.author.username : "anonymous"}
-                </h3>
+                <p className="post-title">
+                <a
+                  className="post-a"
+                  href={`/posts/${post._id}`}
+                >
+                  <span style={{ fontWeight: "bold" }}>{post.title}</span>
+                  <span style={{ fontStyle: "italic" }}>
+                    {post.author
+                      ? `${post.author.fname} ${post.author.lname}`
+                      : "anonymous"}
+                  </span>
+                </a>
+                </p>
               </div>
             );
           } else return null;

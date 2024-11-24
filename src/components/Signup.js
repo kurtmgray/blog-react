@@ -44,9 +44,7 @@ function Signup() {
   }, [userData.user]);
 
   async function handleCallbackResponse(response) {
-    console.log("encoded JWT id token: " + response.credential);
     let userObject = await jwt_decode(response.credential);
-    console.log(userObject);
     setUserData(prev => ({ ...prev, user: userObject }));
   }
 
@@ -67,7 +65,6 @@ function Signup() {
           navigate("/login");
         },
        onError: ({errors}) => {
-          console.log(errors);
           const fieldErrors = errors.errors.reduce((acc, curr) => {
             acc[curr.param] = curr.msg;
             return acc
