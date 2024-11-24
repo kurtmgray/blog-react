@@ -5,7 +5,8 @@ const fetchCurrentUser = async () => {
   const token = localStorage.getItem("token");
   if (!token) return null;
   const res = await fetch(
-    "https://murmuring-dusk-26608.herokuapp.com/api/users",
+    "http://localhost:8000/api/users",
+    // "https://murmuring-dusk-26608.herokuapp.com/api/users",
     {
       headers: {
         Authorization: "Bearer " + token,
@@ -23,7 +24,8 @@ const login = async ({ values }) => {
   if (values.user) {
     // console.log("google auth pathway");
     const res = await fetch(
-      "https://murmuring-dusk-26608.herokuapp.com/api/users/login",
+      "http://localhost:8000/api/users/login",
+      // "https://murmuring-dusk-26608.herokuapp.com/api/users/login",
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -38,7 +40,8 @@ const login = async ({ values }) => {
   } else {
     // console.log("non oauth pathway");
     const res = await fetch(
-      "https://murmuring-dusk-26608.herokuapp.com/api/users/login",
+      "http://localhost:8000/api/users/login",
+      // "https://murmuring-dusk-26608.herokuapp.com/api/users/login",
       {
         method: "POST",
         headers: {
@@ -70,9 +73,12 @@ export const useLogin = () => {
 };
 
 const fetchAllPosts = async () => {
+  console.log("fetching posts");
   const res = await fetch(
-    "https://murmuring-dusk-26608.herokuapp.com/api/posts"
+    "http://localhost:8000/api/posts"
+    // "https://murmuring-dusk-26608.herokuapp.com/api/posts"
   );
+  console.log(res);
   const data = await res.json();
   const timeSortedPosts = data.posts.sort((a, b) =>
     b.timestamp > a.timestamp ? 1 : -1
@@ -85,7 +91,8 @@ export const usePostData = () => {
 
 const fetchSinglePost = async (id) => {
   const res = await fetch(
-    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}`,
+    `http://localhost:8000/api/posts/${id}`,
+    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}`,
     {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
@@ -101,7 +108,8 @@ export const useSinglePost = (id) => {
 
 const deleteSinglePost = async ({ id }) => {
   const res = await fetch(
-    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}`,
+    "http://localhost:8000/api/posts/" + id,
+    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}`,
     {
       method: "DELETE",
       headers: {
@@ -138,7 +146,8 @@ export const useDeleteSinglePost = () => {
 
 const fetchPostComments = async (id) => {
   const res = await fetch(
-    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments`,
+    "http://localhost:8000/api/posts/" + id + "/comments",
+    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments`,
     {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
@@ -157,7 +166,8 @@ export const usePostComments = (id) => {
 
 const postNewComment = async ({ id, currentUser, newComment }) => {
   const res = await fetch(
-    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments`,
+    "http://localhost:8000/api/posts/" + id + "/comments",
+    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments`,
     {
       method: "POST",
       headers: {
@@ -210,7 +220,8 @@ export const useAddComment = () => {
 
 const deleteComment = async ({ e, id }) => {
   const res = await fetch(
-    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments/${e.target.id}`,
+    "http://localhost:8000/api/posts/" + id + "/comments/" + e.target.id,
+    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments/${e.target.id}`,
     {
       method: "DELETE",
       headers: {
@@ -423,7 +434,8 @@ const createPost = async ({ currentUser, newPost }) => {
   }
   console.log(currentUser, newPost);
   const res = await fetch(
-    "https://murmuring-dusk-26608.herokuapp.com/api/posts/",
+    "http://localhost:8000/api/posts/",
+    // "https://murmuring-dusk-26608.herokuapp.com/api/posts/",
     {
       method: "POST",
       headers: {
@@ -479,7 +491,8 @@ export const useCreatePost = () => {
 
 const createUser = async ({ userData }) => {
   const res = await fetch(
-    "https://murmuring-dusk-26608.herokuapp.com/api/users",
+    "http://localhost:8000/api/users",
+    // "https://murmuring-dusk-26608.herokuapp.com/api/users",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -491,8 +504,16 @@ const createUser = async ({ userData }) => {
       }),
     }
   );
+
   const data = await res.json();
-  console.log(data);
+  if (!data.success) {
+    console.log("data.errors", data.errors);
+    throw {
+      message: "Error creating user",
+      errors: data.errors
+    };
+  }
+
 };
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
@@ -502,6 +523,10 @@ export const useCreateUser = () => {
         console.log(oldUsers);
         return [response, ...oldUsers];
       });
+    },
+    onError: (error) => {
+      console.log(error.message);
+      return error.errors
     },
   });
 };

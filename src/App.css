@@ -262,6 +262,7 @@ form:not([label]):not(.comment) {
 }
 
 label {
+  align-self: flex-start;
   text-align: left;
   padding: 0.2rem;
 }
@@ -312,7 +313,7 @@ a:hover {
 
 #signInDiv {
   padding-top: 2rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 2rem;
 }
 
 .hamburger {

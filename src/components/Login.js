@@ -20,7 +20,7 @@ function Login() {
     console.log("encoded JWT id token: " + response.credential);
     let userObject = await jwt_decode(response.credential);
     console.log(userObject);
-    setValues({ ...values, user: await userObject });
+    setValues({ ...values, user: userObject });
     // login({ values });
     // setValues({ ...values, user: null });
   }

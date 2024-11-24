@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useCreateUser } from "../hooks/usePostData";
+import { useCreateUser, useLogin } from "../hooks/usePostData";
+import jwt_decode from "jwt-decode";
+
 
 function Signup() {
   // deleted {setCurrentUser}
@@ -11,22 +13,74 @@ function Signup() {
     confirm: "",
     fname: "",
     lname: "",
+    user: null,
   });
-
+  const [errors, setErrors] = useState({});
+  const { mutate: login } = useLogin();
+  const { mutate: createUser } = useCreateUser();
   let navigate = useNavigate();
 
-  const { mutate: createUser } = useCreateUser();
+
+
+  useEffect(() => {
+    /* global google from script in HTML*/
+    google.accounts.id.initialize({
+      client_id:
+        "23789127279-4aob3sd10qbt8rc5sc2kpupqma2tbg80.apps.googleusercontent.com",
+      callback: handleCallbackResponse,
+    });
+    const signInDiv = document.getElementById("signInDiv");
+    google.accounts.id.renderButton(signInDiv, {
+      theme: "outline",
+      size: "extra-large",
+    });
+  }, []);
+
+  useEffect(() => {
+    if (userData.user) {
+      login({ userData });
+      setUserData(prev => ({ ...prev, user: null }));
+    }
+  }, [userData.user]);
+
+  async function handleCallbackResponse(response) {
+    console.log("encoded JWT id token: " + response.credential);
+    let userObject = await jwt_decode(response.credential);
+    console.log(userObject);
+    setUserData(prev => ({ ...prev, user: userObject }));
+  }
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    createUser({ userData });
-    setUserData({
-      username: "",
-      password: "",
-      confirm: "",
-      fName: "",
-      lname: "",
-    });
-    navigate("/login");
+    createUser(
+      { userData }, 
+      { 
+        onSuccess: () => {
+          setUserData({
+            username: "",
+            password: "",
+            confirm: "",
+            fname: "",
+            lname: "",
+          })
+          navigate("/login");
+        },
+       onError: ({errors}) => {
+          console.log(errors);
+          const fieldErrors = errors.errors.reduce((acc, curr) => {
+            acc[curr.param] = curr.msg;
+            return acc
+          }, {});
+          setErrors(fieldErrors);
+          setUserData(prev => ({
+            ...prev,
+            password: "",
+            confirm: "",
+          }));
+        }   
+      }
+    );
   };
 
   useEffect(() => {
@@ -44,48 +98,51 @@ function Signup() {
     userData.fname,
     userData.lname,
   ]);
-
-  console.log(userData);
-
   return (
     <div className="signup-container">
       <div className="signup">
         <h1>Sign Up</h1>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="username">Enter a username</label>
+          <label htmlFor="username">Username</label>
           <input
             type="text"
             name="username"
-            placeholder="RobinSparkles1992"
             value={userData.username}
             onChange={(e) =>
               setUserData((v) => ({ ...v, [e.target.name]: e.target.value }))
             }
             required
           ></input>
-          <label htmlFor="fname">Enter your first name</label>
+          {errors.username && (
+            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem" }}>{errors.username}</p>
+          )}
+          <label htmlFor="fname">First Name</label>
           <input
             type="text"
             name="fname"
-            placeholder="Robin"
             value={userData.fname}
             onChange={(e) =>
               setUserData((v) => ({ ...v, [e.target.name]: e.target.value }))
             }
             required
           ></input>
-          <label htmlFor="lname">Enter your last name</label>
+          {errors.fname && (
+            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem"   }}>{errors.fname}</p>
+          )}
+          <label htmlFor="lname">Last Name</label>
           <input
             type="text"
             name="lname"
-            placeholder="Scherbatsky"
             value={userData.lname}
             onChange={(e) =>
               setUserData((v) => ({ ...v, [e.target.name]: e.target.value }))
             }
             required
           ></input>
-          <label htmlFor="password">Enter a password</label>
+          {errors.lname && (
+            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem"   }}>{errors.lname}</p>
+          )}
+          <label htmlFor="password">Password</label>
           <input
             type="password"
             name="password"
@@ -95,7 +152,10 @@ function Signup() {
             }
             required
           ></input>
-          <label htmlFor="confirm">Confirm your password</label>
+          {errors.password && (
+            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem"   }}>{errors.password}</p>
+          )}
+          <label htmlFor="confirm">Confirm password</label>
           <input
             type="password"
             name="confirm"
@@ -112,6 +172,13 @@ function Signup() {
             Create Account
           </button>
         </form>
+        <br />
+        <p style={{ fontSize: "0.8rem" }}>or sign up with your Google account</p>
+        <div id="signInDiv"></div>
+        <p style={{ fontSize: "0.8rem" }}>
+          Already have an account? <a href="/login">Log in</a>
+        </p>
+
       </div>
     </div>
   );
