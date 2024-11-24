@@ -1,6 +1,6 @@
 # Blog App
 
-This is a blog application built with React. 
+This is a blog application built with React.
 
 ## Features
 
@@ -8,9 +8,9 @@ This is a blog application built with React.
 - View all posts on the home page
 - View individual blog posts
 - Add comments to blog posts
-- User authentication
+- User authentication, Google OAuth
 
-## Usage 
+## Usage
 
 ### Install Dependencies
 
@@ -33,9 +33,11 @@ Builds the app for production to the build folder. It correctly bundles React in
 The build is minified and the filenames include the hashes. Your app is ready to be deployed!
 
 ## API
+
 This app uses a REST API built with Node/Express hosted at: https://github.com/kurtmgray/blog-api
 
 ## Technologies
+
 - React
 - React Router
 - React Hooks
