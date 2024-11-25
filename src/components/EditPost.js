@@ -134,7 +134,7 @@ function EditPost() {
           </div>
         ) : (
           <div>
-            <p display={true}>You do not have permission to publish.</p>
+            <p display="true">You do not have permission to publish.</p>
           </div>
         )}
         <div className="edit-buttons">
