@@ -369,6 +369,16 @@ a:hover {
   display: none;
 }
 
+.search-bar-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.search-bar {
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
 @media screen and (max-width: 600px) {
   .App {
     margin: 2rem;

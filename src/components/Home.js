@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import homeLogo from "./assets/svg/home.svg";
 import "./fonts/SyneMono-Regular.ttf";
 
-const CachedImage = React.memo(({ src, alt }) => {
+const CachedImage = memo(({ src, alt }) => {
   console.log(`Rendering image with src: ${src}`);
   return <img className="post-img" src={src} alt={alt} />;
 });
@@ -11,15 +11,18 @@ const CachedImage = React.memo(({ src, alt }) => {
 function Home({ posts }) {
   const [searchTerm, setSearchTerm] = useState("");
   
-  const filteredPosts = posts.filter((post) => {
-    if (!searchTerm.trim()) {
-      return true;
-    }
-    return (
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.text.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  const filteredPosts = useMemo(() => {
+    return posts.filter((post) => {
+      if (!searchTerm.trim()) {
+        return true;
+      }
+      return (
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.text.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    })
+  }, [posts, searchTerm]);
+
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   }
@@ -49,15 +52,17 @@ function Home({ posts }) {
       </div>
 
       <hr />
-      <input type="text" placeholder="Search..." className="search-bar" value={searchTerm} onChange={handleSearch}></input>
+      <div className="search-bar-container">
+        <h2 className="posts-h2">Posts({filteredPosts.filter((post) => post.published).length})</h2>
+        <input type="text" placeholder="Search..." className="search-bar" value={searchTerm} onChange={handleSearch}></input>
+      </div>
 
-      <h2 className="posts-h2">Posts({filteredPosts.filter((post) => post.published).length})</h2>
       <div className="posts-container">
         {filteredPosts.map((post) => {
           if (post.published) {
             return (
               <div className="post-card" key={post._id}>
-                <Link className="post-a" href={`/posts/${post._id}`}>
+                <Link className="post-a" to={`/posts/${post._id}`}>
                   <CachedImage
                     src={ post.imgUrl || "https://picsum.photos/200/300" }
                     alt={`post image for ${post.title}`}
@@ -66,7 +71,7 @@ function Home({ posts }) {
                 <p className="post-title">
                 <Link
                   className="post-a"
-                  href={`/posts/${post._id}`}
+                  to={`/posts/${post._id}`}
                 >
                   <span style={{ fontWeight: "bold" }}>{post.title}</span>
                   <span style={{ fontStyle: "italic" }}>
