@@ -18,6 +18,7 @@ body {
   justify-content: center;
   margin: 5rem;
   max-width: 1280px;
+  min-width: 800px;
 }
 
 .navbar {
@@ -87,10 +88,11 @@ body {
 .post-img {
   max-width: 100%;
   object-fit: contain;
-  max-width: 250px;      
-  max-height: 250px;
   border: 2px solid black;
   border-radius: 10px;
+  width: 3000px; /* Fixed width */
+  height: 200px; /* Fixed height */
+  object-fit: cover;
 }
 
 .post-a {
@@ -318,9 +320,9 @@ label {
 .admin-button-container,
 .comment-edit-buttons {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-self: flex-end;
+  flex-direction: column;
+  justify-content: center;
+  align-self: space-around;
 }
 
 button,
@@ -334,6 +336,8 @@ button,
   border-radius: 0.2rem;
   background-color: white;
   cursor: pointer;
+  border: 1px solid #4b3832;
+
 }
 
 button:hover {

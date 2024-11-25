@@ -1,8 +1,30 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import homeLogo from "./assets/svg/home.svg";
 import "./fonts/SyneMono-Regular.ttf";
 
+const CachedImage = React.memo(({ src, alt }) => {
+  console.log(`Rendering image with src: ${src}`);
+  return <img className="post-img" src={src} alt={alt} />;
+});
+
 function Home({ posts }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  const filteredPosts = posts.filter((post) => {
+    if (!searchTerm.trim()) {
+      return true;
+    }
+    return (
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.text.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  }
+
+  
   return (
     <div className="home">
       <div className="hero">
@@ -27,26 +49,22 @@ function Home({ posts }) {
       </div>
 
       <hr />
+      <input type="text" placeholder="Search..." className="search-bar" value={searchTerm} onChange={handleSearch}></input>
 
-      <h2 className="posts-h2">Posts({posts.filter((post) => post.published).length})</h2>
+      <h2 className="posts-h2">Posts({filteredPosts.filter((post) => post.published).length})</h2>
       <div className="posts-container">
-        {posts.map((post) => {
+        {filteredPosts.map((post) => {
           if (post.published) {
             return (
               <div className="post-card" key={post._id}>
-                <a className="post-a" href={`/posts/${post._id}`}>
-                  <img
-                    className="post-img"
-                    src={
-                      post.imgUrl
-                        ? post.imgUrl
-                        : "https://picsum.photos/200/300"
-                    }
-                    alt="pic"
+                <Link className="post-a" href={`/posts/${post._id}`}>
+                  <CachedImage
+                    src={ post.imgUrl || "https://picsum.photos/200/300" }
+                    alt={`post image for ${post.title}`}
                   />
-                </a>
+                </Link>
                 <p className="post-title">
-                <a
+                <Link
                   className="post-a"
                   href={`/posts/${post._id}`}
                 >
@@ -56,7 +74,7 @@ function Home({ posts }) {
                       ? `${post.author.fname} ${post.author.lname}`
                       : "anonymous"}
                   </span>
-                </a>
+                </Link>
                 </p>
               </div>
             );

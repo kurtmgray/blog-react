@@ -44,7 +44,7 @@ function Admin() {
     }
 
     const preview = (text) => {
-        return text.slice(0, 200) + '...'
+        return parse(text.slice(0, 300) + "... ")
     }
     
     return ( 
@@ -54,7 +54,7 @@ function Admin() {
                 {posts.length > 0 ? (
                     posts.map(post =>  (
                         <div className={`admin-post ${post.published ? 'published' : 'unpublished'}`} key={post._id}>
-                            <Link to={`/posts/${post._id}`} className="post-img post-element" style={{textDecoration: 'none'}}>
+                            <Link to={`/posts/${post._id}`} className="post-element" style={{textDecoration: 'none'}}>
                                 <img className="post-img post-element" src={post.imgUrl ? post.imgUrl : 'https://picsum.photos/200/300'} alt="pic"></img>
                             </Link>
                             <div className="post-details post-element">
@@ -62,7 +62,9 @@ function Admin() {
                                 <p className="post-author">{post.author ? post.author.username : 'anonymous' }</p>
                                 <p className="post-date">{getFormattedDate(post.timestamp)}</p>
                             </div>
-                            <p className="post-text-preview post-element">{parse(preview(post.text))}</p>
+                            <p className="post-text-preview post-element" style={{display: "inline"}}>
+                                {preview(post.text)}
+                            </p>
                             <div className="admin-button-container post-element">    
                                 <button className="admin-button" id={post._id} onClick={handleDelete}>Delete</button>
                                 <button className="admin-button" id={post._id} onClick={handleEdit}>Edit</button>
