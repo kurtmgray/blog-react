@@ -13,13 +13,14 @@ import Logout from "./components/Logout";
 import Loading from "./components/Loading";
 import GoogleAuth from "./components/GoogleAuth";
 import { usePostData } from "./hooks/usePostData";
+import { useState, useEffect } from "react";
 
 
 function App() {
   const { data: posts, isLoading, isError } = usePostData();
-
+  
   if (isError) return "Error...";
-  if (isLoading) return <Loading message="Fetching posts..." />;
+  if (isLoading) return <Loading isLoading={isLoading} />;
 
   return (
     <>

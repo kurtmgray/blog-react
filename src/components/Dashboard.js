@@ -4,27 +4,32 @@ import { Link } from "react-router-dom";
 import Loading from "./Loading";
 import parse from "html-react-parser";
 import { usePostData, useCurrentUser } from "../hooks/usePostData";
+import { set } from "date-fns";
 
 function Dashboard() {
-  const { data: currentUser } = useCurrentUser();
-  const { data: posts, isLoading: postsIsLoading } = usePostData();
+  const { data: currentUser, isLoading: currentUserIsLoading } = useCurrentUser();
+  const { data: posts, isLoading: postsIsLoading, refetch: refetchPosts } = usePostData();
+  const [userPosts, setUserPosts] = useState([]);
   let navigate = useNavigate();
 
   useEffect(() => {
-    if (!currentUser) {
+    refetchPosts();
+    setUserPosts([]);
+
+    if (!currentUserIsLoading && !currentUser) {
       navigate("/login");
     }
-  }, [currentUser, navigate]);
+    if (currentUser && posts.length > 0 && !postsIsLoading) {
+      setUserPosts(posts.filter((post) => post.author._id === currentUser.id));
+    }
+  }, [currentUserIsLoading, currentUser, posts, postsIsLoading, navigate]);
 
-  const userPosts = posts.filter((post) => post.author._id === currentUser.id);
 
   const preview = (text) => {
     return text.length > 200 ? text.slice(0, 200) + "..." : text.slice(0, 200);
   };
-  if (postsIsLoading || !userPosts) {
-    return <Loading message="Loading posts..." />;
-  }
-  // if (!userPosts) return "Updating user posts...";
+  
+  (currentUserIsLoading || postsIsLoading) && (<Loading isLoading={currentUserIsLoading || postsIsLoading} />);
 
   return (
     <div>
@@ -34,7 +39,7 @@ function Dashboard() {
           <div className="dashboard-posts-container">
             <h3>Published Posts</h3>
             <hr />
-            {userPosts && userPosts.some((post) => post.published) ? (
+            {userPosts.length > 0 && userPosts.some((post) => post.published) ? (
               userPosts.map((post) => {
                 if (post.published) {
                   return (
@@ -77,7 +82,7 @@ function Dashboard() {
             )}
             <h3>Unpublished Posts</h3>
             <hr />
-            {userPosts && userPosts.some((post) => !post.published) ? (
+            {userPosts.length > 0 && userPosts.some((post) => !post.published) ? (
               userPosts.map((post) => {
                 if (!post.published) {
                   return (

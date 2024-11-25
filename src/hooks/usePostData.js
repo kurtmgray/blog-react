@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
 
-// Login.js
+const BASE_URL = "http://localhost:8000/api";
+// const BASE_URL = "https://murmuring-dusk-26608.herokuapp.com/api";
+
 const fetchCurrentUser = async () => {
   const token = localStorage.getItem("token");
   if (!token) return null;
   const res = await fetch(
-    "http://localhost:8000/api/users",
-    // "https://murmuring-dusk-26608.herokuapp.com/api/users",
+    `${BASE_URL}/users`,
     {
       headers: {
         Authorization: "Bearer " + token,
@@ -24,8 +25,7 @@ const login = async ({ values }) => {
   if (values.user) {
     // console.log("google auth pathway");
     const res = await fetch(
-      "http://localhost:8000/api/users/login",
-      // "https://murmuring-dusk-26608.herokuapp.com/api/users/login",
+      `${BASE_URL}/login`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -36,12 +36,17 @@ const login = async ({ values }) => {
       }
     );
     const data = await res.json();
+    if (!data.success) {
+      throw {
+        message: data.message,
+        field: data.field,
+      }
+    }
     return data;
   } else {
     // console.log("non oauth pathway");
     const res = await fetch(
-      "http://localhost:8000/api/users/login",
-      // "https://murmuring-dusk-26608.herokuapp.com/api/users/login",
+      `${BASE_URL}/users/login`,
       {
         method: "POST",
         headers: {
@@ -54,18 +59,21 @@ const login = async ({ values }) => {
       }
     );
     const data = await res.json();
-
+    if (!data.success) {
+      throw {
+        message: data.message,
+        field: data.field,
+      };
+    }
     return data;
   }
 };
 export const useLogin = () => {
   const queryClient = useQueryClient();
   return useMutation(login, {
-    onError: (err) => {
-      console.log(err);
-    },
+    onError: (err) => err,
     onSuccess: (response) => {
-      console.log(response);
+      // console.log(response);
       queryClient.setQueryData("current-user", response.user);
       localStorage.setItem("token", response.token);
     },
@@ -73,12 +81,9 @@ export const useLogin = () => {
 };
 
 const fetchAllPosts = async () => {
-  console.log("fetching posts");
   const res = await fetch(
-    "http://localhost:8000/api/posts"
-    // "https://murmuring-dusk-26608.herokuapp.com/api/posts"
+    `${BASE_URL}/posts`,
   );
-  console.log(res);
   const data = await res.json();
   const timeSortedPosts = data.posts.sort((a, b) =>
     b.timestamp > a.timestamp ? 1 : -1
@@ -91,8 +96,7 @@ export const usePostData = () => {
 
 const fetchSinglePost = async (id) => {
   const res = await fetch(
-    `http://localhost:8000/api/posts/${id}`,
-    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}`,
+    `${BASE_URL}/posts/${id}`,
     {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
@@ -108,8 +112,7 @@ export const useSinglePost = (id) => {
 
 const deleteSinglePost = async ({ id }) => {
   const res = await fetch(
-    "http://localhost:8000/api/posts/" + id,
-    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}`,
+    `${BASE_URL}/posts/${id}`,
     {
       method: "DELETE",
       headers: {
@@ -126,16 +129,12 @@ export const useDeleteSinglePost = () => {
     onMutate: async ({ id }) => {
       await queryClient.cancelQueries("posts");
       const previousPosts = queryClient.getQueryData("posts");
-      queryClient.setQueryData("posts", (oldPosts) => {
-        const newPosts = [...oldPosts];
-        const index = newPosts.findIndex((post) => post._id === id);
-        newPosts.splice(index, 1);
-        return newPosts;
-      });
+      queryClient.setQueryData("posts", (oldPosts) =>
+        oldPosts ? oldPosts.filter((post) => post._id !== id) : []
+      );
       return { previousPosts };
     },
     onError: (err, _deletePostData, context) => {
-      console.log(err.message);
       queryClient.setQueryData("posts", context.previousPosts);
     },
     onSettled: () => {
@@ -146,8 +145,7 @@ export const useDeleteSinglePost = () => {
 
 const fetchPostComments = async (id) => {
   const res = await fetch(
-    "http://localhost:8000/api/posts/" + id + "/comments",
-    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments`,
+    `${BASE_URL}/posts/${id}/comments`,
     {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
@@ -166,8 +164,7 @@ export const usePostComments = (id) => {
 
 const postNewComment = async ({ id, currentUser, newComment }) => {
   const res = await fetch(
-    "http://localhost:8000/api/posts/" + id + "/comments",
-    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments`,
+    `${BASE_URL}/posts/${id}/comments`,
     {
       method: "POST",
       headers: {
@@ -187,7 +184,7 @@ export const useAddComment = () => {
   const queryClient = useQueryClient();
   return useMutation(postNewComment, {
     onMutate: async ({ id, currentUser, newComment }) => {
-      console.log(currentUser);
+      // console.log(currentUser);
       await queryClient.cancelQueries(["post-comments", id]);
       const previousComments = queryClient.getQueryData(["post-comments", id]);
       queryClient.setQueryData(["post-comments", id], (oldPostComments) => {
@@ -220,8 +217,7 @@ export const useAddComment = () => {
 
 const deleteComment = async ({ e, id }) => {
   const res = await fetch(
-    "http://localhost:8000/api/posts/" + id + "/comments/" + e.target.id,
-    // `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments/${e.target.id}`,
+    `${BASE_URL}/posts/${id}/comments/${e.target.id}`,
     {
       method: "DELETE",
       headers: {
@@ -261,7 +257,7 @@ export const useDeleteComment = () => {
 
 const saveCommentEdit = async ({ e, id, editedCommentText }) => {
   const res = await fetch(
-    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${id}/comments/${e.target.id}`,
+    `${BASE_URL}/posts/${id}/comments/${e.target.id}`,
     {
       method: "PATCH",
       headers: {
@@ -311,7 +307,7 @@ export const useSaveCommentEdit = () => {
 
 const publishToggle = async ({ post }) => {
   const res = await fetch(
-    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${post._id}`,
+    `${BASE_URL}/posts/${post._id}`,
     {
       method: "PATCH",
       headers: {
@@ -324,7 +320,7 @@ const publishToggle = async ({ post }) => {
     }
   );
   const data = await res.json();
-  console.log(data.updatedPost);
+  // console.log(data.updatedPost);
   return data.updatedPost;
 };
 export const usePublishToggle = () => {
@@ -366,9 +362,9 @@ export const usePublishToggle = () => {
 };
 
 const editPost = async ({ postData, values }) => {
-  console.log(values.imgUrl);
+  // console.log(values.imgUrl);
   const res = await fetch(
-    `https://murmuring-dusk-26608.herokuapp.com/api/posts/${postData._id}`,
+    `${BASE_URL}/posts/${postData._id}`,
     {
       method: "PUT",
       headers: {
@@ -399,7 +395,7 @@ export const useEditPost = (id) => {
       const previousPost = queryClient.getQueryData(["post"], postData._id);
       const previousPosts = queryClient.getQueryData("posts");
       queryClient.setQueryData(["post", postData._id], (oldPost) => {
-        console.log(values);
+        // console.log(values);
         return {
           ...oldPost,
           _id: postData._id,
@@ -432,10 +428,9 @@ const createPost = async ({ currentUser, newPost }) => {
     const hash = Math.floor(Math.random() * 1000);
     return `https://picsum.photos/id/${hash}/250`;
   }
-  console.log(currentUser, newPost);
+  // console.log(currentUser, newPost);
   const res = await fetch(
-    "http://localhost:8000/api/posts/",
-    // "https://murmuring-dusk-26608.herokuapp.com/api/posts/",
+    `${BASE_URL}/posts/`,
     {
       method: "POST",
       headers: {
@@ -453,7 +448,6 @@ const createPost = async ({ currentUser, newPost }) => {
     }
   );
   const data = await res.json();
-  console.log(data);
   return data.post;
 };
 export const useCreatePost = () => {
@@ -463,7 +457,7 @@ export const useCreatePost = () => {
       await queryClient.cancelQueries("posts");
       const previousPostData = queryClient.getQueryData("posts");
       queryClient.setQueryData("posts", (oldPostsData) => {
-        console.log(oldPostsData);
+        // console.log(oldPostsData);
         return [
           {
             author: {
@@ -491,8 +485,7 @@ export const useCreatePost = () => {
 
 const createUser = async ({ userData }) => {
   const res = await fetch(
-    "http://localhost:8000/api/users",
-    // "https://murmuring-dusk-26608.herokuapp.com/api/users",
+    `${BASE_URL}/users`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -507,7 +500,6 @@ const createUser = async ({ userData }) => {
 
   const data = await res.json();
   if (!data.success) {
-    console.log("data.errors", data.errors);
     throw {
       message: "Error creating user",
       errors: data.errors
@@ -520,12 +512,12 @@ export const useCreateUser = () => {
   return useMutation(createUser, {
     onSuccess: (response) => {
       queryClient.setQueryData("users", (oldUsers) => {
-        console.log(oldUsers);
+        // console.log(oldUsers);
         return [response, ...oldUsers];
       });
     },
     onError: (error) => {
-      console.log(error.message);
+      // console.log(error.message);
       return error.errors
     },
   });

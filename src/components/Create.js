@@ -41,7 +41,7 @@ function Create() {
         <h1>Create Post</h1>
         <form onSubmit={handleSubmit}>
           <label className="create-post-title" htmlFor="title">
-            <h3>Post Title:</h3>
+            <p>Post Title:</p>
           </label>
           <input
             className="create-post-title-input"
@@ -53,20 +53,24 @@ function Create() {
             }
             required
           ></input>
-          <label className="imgUrl" htmlFor="imgUrl">
-            <h3>Image URL:</h3>
-          </label>
-          <input
-            className="imgUrl-input"
-            type="text"
-            name="imgUrl"
-            value={newPost.imgUrl}
-            onChange={(e) =>
-              setNewPost((v) => ({ ...v, [e.target.name]: e.target.value }))
-            }
-          ></input>
+          {currentUser.admin && (
+            <>
+              <label className="imgUrl" htmlFor="imgUrl">
+                <p>Image URL:</p>
+              </label>
+              <input
+                className="imgUrl-input"
+                type="text"
+                name="imgUrl"
+                value={newPost.imgUrl}
+                onChange={(e) =>
+                  setNewPost((v) => ({ ...v, [e.target.name]: e.target.value }))
+                }
+              ></input>
+            </>
+          )}
           <label className="text-input" htmlFor="text">
-            <h3>Content:</h3>
+            <p>Content:</p>
           </label>
           <Editor
             apiKey={process.env.REACT_APP_EDITOR_KEY}

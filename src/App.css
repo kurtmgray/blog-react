@@ -133,6 +133,12 @@ body {
   padding: 10px;             
 }
 
+.signup h1,
+.login h1
+.create h1 {
+  font-family: "Syne Mono", monospace;
+}
+
 .login-container,
 .signup-container,
 .create-container {
@@ -153,6 +159,7 @@ body {
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   padding: 2rem;
   margin-top: 2rem;
+  background-color:  #a8c0c9;
 }
 
 .dashboard-posts-container {

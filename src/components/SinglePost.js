@@ -13,6 +13,7 @@ import {
   useDeleteSinglePost,
   useCurrentUser,
 } from "../hooks/usePostData";
+import Loading from "./Loading";
 
 function SinglePost() {
   const { data: currentUser } = useCurrentUser();
@@ -28,8 +29,13 @@ function SinglePost() {
 
   const { mutate: deletePost } = useDeleteSinglePost();
   const handleDeletePost = () => {
-    deletePost({ id });
-    navigate("/dashboard");
+    deletePost(
+      { id },
+      {
+        onSettled: () => {
+          navigate("/dashboard");
+        },
+      })
   };
 
   const { mutate: publishToggle } = usePublishToggle();
@@ -61,7 +67,8 @@ function SinglePost() {
     saveCommentEdit({ e, id, editedCommentText });
   };
 
-  if (singlePostIsLoading) return <p>loading...</p>;
+  if (singlePostIsLoading) return <Loading isLoading={singlePostIsLoading} />;
+  // if (isDeleting) return <Loading isLoading={isDeleting} />;
 
   return (
       <div className="single-post-container">

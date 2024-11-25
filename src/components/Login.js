@@ -9,7 +9,10 @@ function Login() {
     password: "",
     user: null,
   });
-  const [err] = useState(null);
+  const [error, setError] = useState({
+    field: "",
+    message: "",
+  });
 
   let navigate = useNavigate();
 
@@ -51,8 +54,19 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    login({ values });
-    setValues({ username: "", password: "" });
+    login(
+      { values },
+      {
+        onError: (error) => {
+         setError(error);
+         setValues(prev => ({ ...prev, password: "" }));
+
+        }, 
+        onSuccess: () => {
+          setValues(prev => ({ ...prev, username: "", password: "" }));
+        }
+      }
+    );
   };
 
   return (
@@ -71,6 +85,9 @@ function Login() {
             }
             required
           ></input>
+          {error.field === "username" && (
+            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem"   }}>{error.message}</p>
+          )}
           <label htmlFor="password">Enter your password</label>
           <input
             type="password"
@@ -81,7 +98,10 @@ function Login() {
             }
             required
           ></input>
-          {err ? <p>{err.message}</p> : null}
+          {error.field === "password" && (
+            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem"   }}>{error.message}</p>
+          )}
+          {/* {err ? <p>{err.message}</p> : null} */}
           <button type="submit">Log In</button>
         </form>
         <div id="signInDiv"></div>
