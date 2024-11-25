@@ -25,7 +25,7 @@ const login = async ({ values }) => {
   if (values.user) {
     // console.log("google auth pathway");
     const res = await fetch(
-      `${BASE_URL}/login`,
+      `${BASE_URL}/users/login`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
