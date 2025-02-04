@@ -1,81 +1,97 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { useCreateUser, useLogin } from "../hooks/usePostData";
-import jwt_decode from "jwt-decode";
-
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { useCreateUser, useLogin } from '../hooks/usePostData';
+import jwt_decode from 'jwt-decode';
 
 function Signup() {
   // deleted {setCurrentUser}
   const [disable, setDisable] = useState(true);
   const [userData, setUserData] = useState({
-    username: "",
-    password: "",
-    confirm: "",
-    fname: "",
-    lname: "",
+    username: '',
+    password: '',
+    confirm: '',
+    fname: '',
+    lname: '',
     user: null,
   });
   const [errors, setErrors] = useState({});
+  const [confirmTouched, setConfirmTouched] = useState(false); // Track confirm field interaction
   const { mutate: login } = useLogin();
   const { mutate: createUser } = useCreateUser();
   let navigate = useNavigate();
-
-
 
   useEffect(() => {
     /* global google from script in HTML*/
     google.accounts.id.initialize({
       client_id:
-        "23789127279-4aob3sd10qbt8rc5sc2kpupqma2tbg80.apps.googleusercontent.com",
+        '23789127279-4aob3sd10qbt8rc5sc2kpupqma2tbg80.apps.googleusercontent.com',
       callback: handleCallbackResponse,
     });
-    const signInDiv = document.getElementById("signInDiv");
+    const signInDiv = document.getElementById('signInDiv');
     google.accounts.id.renderButton(signInDiv, {
-      theme: "outline",
-      size: "extra-large",
+      theme: 'outline',
+      size: 'extra-large',
     });
   }, []);
 
   useEffect(() => {
     if (userData.user) {
       login({ userData });
-      setUserData(prev => ({ ...prev, user: null }));
+      setUserData((prev) => ({ ...prev, user: null }));
     }
   }, [userData.user]);
 
   async function handleCallbackResponse(response) {
     let userObject = await jwt_decode(response.credential);
-    setUserData(prev => ({ ...prev, user: userObject }));
+    setUserData((prev) => ({ ...prev, user: userObject }));
   }
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     createUser(
-      { userData }, 
-      { 
-        onSuccess: () => {
+      { userData },
+      {
+        onSuccess: (createdUser) => {
           setUserData({
-            username: "",
-            password: "",
-            confirm: "",
-            fname: "",
-            lname: "",
-          })
-          navigate("/login");
+            username: '',
+            password: '',
+            confirm: '',
+            fname: '',
+            lname: '',
+          });
+          login(
+            {
+              values: {
+                username: createdUser.username,
+                password: userData.password,
+              },
+            },
+            {
+              onSuccess: () => navigate('/'),
+            }
+          );
         },
-       onError: ({errors}) => {
-          const fieldErrors = errors.errors.reduce((acc, curr) => {
+        onError: (error) => {
+          if (
+            error.field === 'usernameTaken' ||
+            error.errors.field === 'usernameTaken'
+          ) {
+            setErrors((prev) => ({
+              ...prev,
+              submitError: 'Username already taken.',
+            }));
+          }
+          const fieldErrors = error.errors.reduce((acc, curr) => {
             acc[curr.param] = curr.msg;
-            return acc
+            return acc;
           }, {});
           setErrors(fieldErrors);
-          setUserData(prev => ({
+          setUserData((prev) => ({
             ...prev,
-            password: "",
-            confirm: "",
+            password: '',
+            confirm: '',
           }));
-        }   
+        },
       }
     );
   };
@@ -111,7 +127,11 @@ function Signup() {
             required
           ></input>
           {errors.username && (
-            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem" }}>{errors.username}</p>
+            <p
+              style={{ color: 'red', marginTop: '-1.8rem', fontSize: '0.9rem' }}
+            >
+              {errors.username}
+            </p>
           )}
           <label htmlFor="fname">First Name</label>
           <input
@@ -124,7 +144,11 @@ function Signup() {
             required
           ></input>
           {errors.fname && (
-            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem"   }}>{errors.fname}</p>
+            <p
+              style={{ color: 'red', marginTop: '-1.8rem', fontSize: '0.9rem' }}
+            >
+              {errors.fname}
+            </p>
           )}
           <label htmlFor="lname">Last Name</label>
           <input
@@ -137,7 +161,11 @@ function Signup() {
             required
           ></input>
           {errors.lname && (
-            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem"   }}>{errors.lname}</p>
+            <p
+              style={{ color: 'red', marginTop: '-1.8rem', fontSize: '0.9rem' }}
+            >
+              {errors.lname}
+            </p>
           )}
           <label htmlFor="password">Password</label>
           <input
@@ -150,7 +178,11 @@ function Signup() {
             required
           ></input>
           {errors.password && (
-            <p style={{ color: "red", marginTop: "-1.8rem", fontSize: "0.9rem"   }}>{errors.password}</p>
+            <p
+              style={{ color: 'red', marginTop: '-1.8rem', fontSize: '0.9rem' }}
+            >
+              {errors.password}
+            </p>
           )}
           <label htmlFor="confirm">Confirm password</label>
           <input
@@ -160,22 +192,35 @@ function Signup() {
             onChange={(e) =>
               setUserData((v) => ({ ...v, [e.target.name]: e.target.value }))
             }
+            onBlur={() => setConfirmTouched(true)}
             required
-          ></input>
-          {userData.confirm === userData.password ? null : (
-            <p>Passwords do not match.</p>
+          />
+          {confirmTouched && userData.confirm !== userData.password && (
+            <p
+              style={{ color: 'red', marginTop: '-1.8rem', fontSize: '0.9rem' }}
+            >
+              Passwords do not match.
+            </p>
           )}
           <button type="submit" disabled={disable}>
             Create Account
           </button>
+          {errors.submitError && (
+            <p
+              style={{ color: 'red', fontSize: '0.9rem', marginTop: '0.5rem' }}
+            >
+              {errors.submitError}
+            </p>
+          )}
         </form>
         <br />
-        <p style={{ fontSize: "0.8rem" }}>or sign up with your Google account</p>
+        <p style={{ fontSize: '0.8rem' }}>
+          or sign up with your Google account
+        </p>
         <div id="signInDiv"></div>
-        <p style={{ fontSize: "0.8rem" }}>
+        <p style={{ fontSize: '0.8rem' }}>
           Already have an account? <a href="/login">Log in</a>
         </p>
-
       </div>
     </div>
   );

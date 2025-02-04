@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { useParams } from "react-router-dom";
-import { Editor } from "@tinymce/tinymce-react";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
+import { Editor } from '@tinymce/tinymce-react';
 import {
   useSinglePost,
   useEditPost,
   useCurrentUser,
-} from "../hooks/usePostData";
+} from '../hooks/usePostData';
 
 function EditPost() {
   const { data: currentUser } = useCurrentUser();
 
   const { id } = useParams();
   const [values, setValues] = useState({
-    title: "",
-    text: "",
-    imgUrl: "",
+    title: '',
+    text: '',
+    imgUrl: '',
     published: false,
   });
 
@@ -88,7 +88,6 @@ function EditPost() {
                 imgUrl: e.target.value,
                 published: false,
               }));
-              console.log(values);
             }}
             required
           ></input>
@@ -103,10 +102,10 @@ function EditPost() {
               height: 400,
               menubar: false,
               plugins: [
-                "advlist autolink lists link image",
-                "charmap print preview anchor help",
-                "searchreplace visualblocks code",
-                "insertdatetime media table paste wordcount",
+                'advlist autolink lists link image',
+                'charmap print preview anchor help',
+                'searchreplace visualblocks code',
+                'insertdatetime media table paste wordcount',
               ],
               toolbar:
                 // prettier-ignore
@@ -140,7 +139,7 @@ function EditPost() {
         <div className="edit-buttons">
           <button onClick={handleCancel}>Cancel</button>
           <button type="submit">
-            Submit {!currentUser.canPublish && "for Approval"}
+            Submit {!currentUser.canPublish && 'for Approval'}
           </button>
         </div>
       </form>
