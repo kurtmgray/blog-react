@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 
-const BASE_URL = 'http://localhost:8000/api';
-// const BASE_URL = 'https://murmuring-dusk-26608.herokuapp.com/api';
+// const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = 'https://murmuring-dusk-26608.herokuapp.com/api';
 
 const fetchCurrentUser = async () => {
   const token = localStorage.getItem('token');
