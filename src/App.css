@@ -86,14 +86,12 @@ body {
 }
 
 .post-img {
-  max-width: 100%;
-  object-fit: contain;
-  border: 2px solid black;
-  border-radius: 10px;
-  width: 3000px; /* Fixed width */
-  height: 200px; /* Fixed height */
+  max-width: 100px;
+  height: auto;
+  border-radius: 5px;
   object-fit: cover;
 }
+
 
 .post-a {
   display: flex;
@@ -116,6 +114,8 @@ body {
 }
 
 .single-post-container {
+  background-color: #fff; 
+  padding: 1rem;
   margin-top: 2rem;
   display: flex;
   flex-direction: column;
@@ -171,6 +171,7 @@ body {
 .dashboard-post {
   display: flex;
   align-items: center;
+  background-color: #fff; 
   padding: 0.5rem 1.5rem;
 }
 
@@ -190,10 +191,16 @@ body {
 
 .admin-post {
   display: flex;
+  flex-wrap: wrap; 
   align-items: center;
-  padding: 0.5rem 1.5rem;
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+  justify-content: space-between; 
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #fff; 
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
+
 
 .post-details {
   display: flex;
@@ -204,12 +211,18 @@ body {
 }
 
 .unpublished {
-  background-color: rgb(221, 221, 221);
+  background-color: rgba(221, 221, 221, 0.5);
+  border-left: 5px solid red; 
 }
+
 
 .post-text-preview {
   flex: 3;
+  max-width: 600px; 
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
 
 .post-element {
   margin: 0.5rem;
@@ -317,7 +330,15 @@ label {
   padding: 16px;
 }
 
-.admin-button-container,
+
+.admin-button-container {
+  display: flex;
+  flex-direction: row; 
+  justify-content: center;
+  gap: 0.5rem; 
+  margin-top: 0.5rem;
+}
+
 .comment-edit-buttons {
   display: flex;
   flex-direction: column;
@@ -325,8 +346,20 @@ label {
   align-self: space-around;
 }
 
+.admin-button {
+  padding: 0.5rem;
+  width: auto; 
+  min-width: 6rem; 
+  border-radius: 5px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.admin-button:hover {
+  background-color: #e0e0e0;
+}
+
+
 button,
-.admin-button,
 .edit-button {
   border: none;
   margin: 0.2rem;
@@ -401,6 +434,7 @@ a:hover {
 
   .post-card {
     width: 100%;
+    background-color: #fff; 
   }
 
   textarea.new-post,
